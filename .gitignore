@@ -1,0 +1,22 @@
+# Binaries & Large Archives
+*.apk
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.tzst
+*.exe
+*.dll
+*.pdb
+
+# Build & Scratch Artifacts
+bin/
+obj/
+__pycache__/
+*.pyc
+
+# OS & Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
