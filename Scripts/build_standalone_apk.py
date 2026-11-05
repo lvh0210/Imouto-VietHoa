@@ -10,8 +10,10 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 base_apk = r"D:\Downloads\Winlator_11.2.apk"
 game_zip = r"D:\Downloads\妹と過ごす1ヵ月間_Re(viethoa).zip"
-icon_path = r"C:\Users\LvH\.gemini\antigravity\brain\35a34904-5000-44fe-a7dc-588d0018da1f\scratch\icon.png"
-output_apk = r"D:\Downloads\妹と過ごす1ヵ月間_Re_ViệtHóa.apk"
+script_dir = os.path.dirname(os.path.abspath(__file__))
+repo_dir = os.path.dirname(script_dir)
+icon_path = os.path.join(repo_dir, "Data", "icon.png")
+output_apk = r"D:\Downloads\Imouto_Re_VietHoa.apk"
 
 print(f"Loading icon from {icon_path}...")
 base_icon = Image.open(icon_path).convert('RGBA')
@@ -83,55 +85,22 @@ cert = (
     .sign(key, hashes.SHA256())
 )
 
-# 1. Generate META-INF/MANIFEST.MF
-manifest_lines = [
-    "Manifest-Version: 1.0",
-    "Created-By: 1.0 (Android SignApk)",
-    ""
-]
-
-file_manifest_entries = {}
-for filename in sorted(apk_files.keys()):
-    digest = base64.b64encode(hashlib.sha256(apk_files[filename]).digest()).decode('ascii')
-    entry = f"Name: {filename}\r\nSHA-256-Digest: {digest}\r\n\r\n"
-    file_manifest_entries[filename] = entry
-    manifest_lines.append(f"Name: {filename}")
-    manifest_lines.append(f"SHA-256-Digest: {digest}")
-    manifest_lines.append("")
-
-manifest_content = "\r\n".join(manifest_lines).encode('utf-8')
-apk_files['META-INF/MANIFEST.MF'] = manifest_content
-
-# 2. Generate META-INF/CERT.SF
-manifest_digest = base64.b64encode(hashlib.sha256(manifest_content).digest()).decode('ascii')
-sf_lines = [
-    "Signature-Version: 1.0",
-    "Created-By: 1.0 (Android SignApk)",
-    f"SHA-256-Digest-Manifest: {manifest_digest}",
-    ""
-]
-
-for filename in sorted(file_manifest_entries.keys()):
-    entry_bytes = file_manifest_entries[filename].encode('utf-8')
-    digest = base64.b64encode(hashlib.sha256(entry_bytes).digest()).decode('ascii')
-    sf_lines.append(f"Name: {filename}")
-    sf_lines.append(f"SHA-256-Digest: {digest}")
-    sf_lines.append("")
-
-sf_content = "\r\n".join(sf_lines).encode('utf-8')
-apk_files['META-INF/CERT.SF'] = sf_content
-
-# 3. Generate META-INF/CERT.RSA
-builder = pkcs7.PKCS7SignatureBuilder().set_data(sf_content).add_signer(cert, key, hashes.SHA256())
-rsa_content = builder.sign(serialization.Encoding.DER, options=[pkcs7.PKCS7Options.DetachedSignature])
-apk_files['META-INF/CERT.RSA'] = rsa_content
-
-print("Writing signed APK to disk...")
-with zipfile.ZipFile(output_apk, 'w', compression=zipfile.ZIP_DEFLATED) as out_zip:
+# Write unsigned APK
+unsigned_apk = output_apk + ".unsigned"
+print(f"Writing base APK to {unsigned_apk}...")
+with zipfile.ZipFile(unsigned_apk, 'w', compression=zipfile.ZIP_DEFLATED) as out_zip:
     for filename, data in apk_files.items():
-        # Store uncompressed for .so and audio if needed, or deflate
         out_zip.writestr(filename, data)
 
+# Sign with APK Signature Scheme v2 & v3 using sign_apk
+print("Signing APK with APK Signature Schemes v2 & v3...")
+from sign_apk import signer, keys
+km = keys.KeyMaterial(private_key=key, certificate=cert)
+signer.sign_apk(unsigned_apk, output_apk, key_material=km, v2=True, v3=True)
+
+if os.path.exists(unsigned_apk):
+    os.remove(unsigned_apk)
+
 out_size = os.path.getsize(output_apk)
-print(f"SUCCESS! Created signed standalone APK: {output_apk}")
+print(f"SUCCESS! Created signed standalone APK (v2+v3): {output_apk}")
 print(f"Final APK size: {out_size / (1024*1024):.2f} MB")
