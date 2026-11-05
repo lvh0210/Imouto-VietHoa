@@ -50,7 +50,7 @@ Dự án áp dụng giải pháp can thiệp nhị phân chuyên sâu kết hợ
 ## 📱 3. Hướng Dẫn Cài Đặt
 
 ### Cách 1: Cài đặt trực tiếp qua file Standalone APK (Dành cho Android)
-1. Tải file **`妹と過ごす1ヵ月間_Re_ViệtHóa.apk`** từ mục [Releases](https://github.com/lvh0210/Imouto-VietHoa/releases).
+1. Tải file **`Imouto_Re_VietHoa.apk`** (~711 MB) từ mục [Releases](https://github.com/lvh0210/Imouto-VietHoa/releases/latest).
 2. Cài đặt file APK lên điện thoại Android (yêu cầu Android 8.0 trở lên, khuyến nghị chip Snapdragon 7/8 series).
 3. Mở ứng dụng `ImoutoRe` từ màn hình chính để vào thẳng game và chơi mượt mà với bàn phím cảm ứng được tích hợp sẵn.
 
