@@ -525,6 +525,44 @@ namespace ImoutoVi
             return vnRegex.IsMatch(text);
         }
 
+
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+        public static void InitializeMobileHook()
+        {
+            Init();
+            try
+            {
+                TMPro.TMPro_EventManager.TEXT_CHANGED_EVENT.Add(OnTmProTextChanged);
+                UnityEngine.Debug.Log("[ImoutoVi] Native Mobile Translation Hook initialized successfully!");
+            }
+            catch (Exception ex)
+            {
+                UnityEngine.Debug.LogWarning("[ImoutoVi] TMPro_EventManager hook warning: " + ex.Message);
+            }
+        }
+
+        private static bool isTranslating = false;
+        private static void OnTmProTextChanged(UnityEngine.Object obj)
+        {
+            if (isTranslating) return;
+            if (obj is TMPro.TMP_Text tmp && !string.IsNullOrEmpty(tmp.text))
+            {
+                isTranslating = true;
+                try
+                {
+                    string trans = Translate(tmp.text);
+                    if (!string.Equals(trans, tmp.text, StringComparison.Ordinal))
+                    {
+                        tmp.text = trans;
+                    }
+                }
+                finally
+                {
+                    isTranslating = false;
+                }
+            }
+        }
+
         public static void LogMiss(string text)
         {
             if (string.IsNullOrEmpty(text) || text.Length <= 1) return;
