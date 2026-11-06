@@ -4,10 +4,17 @@
 * **Dự án:** Bản địa hóa tiếng Việt `妹と過ごす1ヵ月間_Re` (One Month with My Sister _Re)
 * **Thư mục dự án:** `D:\VibeCode\Game_VietHoa\Imouto_VietHoa`
 * **Tác giả:** `lvh0210`
-* **Phiên bản:** v2.0.0 (Bản Native Android ARM64 IL2CPP & Windows PC)
+* **Phiên bản:** v2.0.1 (Hotfix Khắc Phục Đen Màn Hình Android & Windows PC)
 * **Ngày cập nhật:** 06/11/2026
 
 ## 2. Nhật Ký Phiên Bản (Changelog)
+### [v2.0.1] - 06/11/2026 (Hotfix Sửa Lỗi Đen Màn Hình Native Android)
+* **Khóa cứng Graphics API OpenGL ES 3:** Vô hiệu hóa Vulkan mặc định trên Unity 2022.3 Android để loại bỏ hoàn toàn lỗi swapchain/subpass gây đen màn hình trên các chip đồ họa ARM Mali, Qualcomm Adreno và PowerVR.
+* **Sửa xung đột Camera Depth Naninovel:** Xử lý triệt để việc `NaniCamera` (depth 0, ClearFlags Solid Color Black) che phủ đè lên `Main Camera` (depth -1) trong Title scene. Tự động tắt camera nền và nâng depth của Main Camera lên 10.
+* **Sửa URP CameraStack Null Reference Exception:** Kiểm tra `uICamera != null` và tránh trùng lặp trước khi thêm vào `UniversalAdditionalCameraData.cameraStack`, ngăn ngừa ngắt quãng pipeline render đồ họa của URP ở mỗi khung hình.
+* **Cơ chế Failsafe tự động giải phóng rèm đen:** Bổ sung `ForceDismissBlackScreen()` với timeout 1.0s - 2.0s trong `SceneMaster` và `TitleSceneManager`, bảo đảm rèm đen luôn tự động biến mất kể cả khi animation làm mờ DOTween bị hoãn.
+* **Cập nhật ImoutoVi:** Hỗ trợ nạp đồng bộ từ điển từ `Resources/translation_extra.json` ngay khi khởi động.
+
 ### [v2.0.0] - 06/11/2026 (Bản Native Android Thuần)
 * **Chuyển đổi Native ARM64 IL2CPP:** Loại bỏ hoàn toàn lớp bọc giả lập Winlator/Wine/Box64. Biên dịch trực tiếp mã nguồn Unity C# sang Native C++ Machine Code (`libil2cpp.so` 98.84 MB) cho kiến trúc di động `arm64-v8a`.
 * **Hiệu năng & Trải nghiệm:** Chạy mượt mà 60 FPS, không hao pin, không bị văng app (crash), tích hợp sẵn điều khiển cảm ứng.

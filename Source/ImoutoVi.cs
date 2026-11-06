@@ -212,25 +212,42 @@ namespace ImoutoVi
                 candidatePaths.Add("/storage/emulated/0/MT2/妹と過ごす1ヵ月間_Re/妹と過ごす1ヵ月間_Re_Data/StreamingAssets/translation_extra.json");
                 candidatePaths.Add("/storage/emulated/0/MT2/妹と過ごす1ヵ月間_Re/妹と過ごす1ヵ月間_Re_Data/translation_extra.json");
 
-                string foundPath = null;
-                foreach (var p in candidatePaths)
+                try
                 {
-                    if (!string.IsNullOrEmpty(p) && File.Exists(p))
+                    var textAsset = UnityEngine.Resources.Load<UnityEngine.TextAsset>("translation_extra");
+                    if (textAsset != null && !string.IsNullOrEmpty(textAsset.text))
                     {
-                        foundPath = p;
-                        break;
+                        ParseJson(textAsset.text);
+                        SafeLog("[ImoutoVi] Successfully loaded " + dict.Count + " entries from Resources/translation_extra");
                     }
                 }
-
-                if (foundPath != null)
+                catch (Exception ex)
                 {
-                    string json = File.ReadAllText(foundPath, Encoding.UTF8);
-                    ParseJson(json);
-                    SafeLog("[ImoutoVi] Successfully loaded " + dict.Count + " entries from " + foundPath);
+                    SafeLogWarning("[ImoutoVi] Resources.Load error: " + ex.Message);
                 }
-                else
+
+                if (dict.Count == 0)
                 {
-                    SafeLogWarning("[ImoutoVi] translation_extra.json not found!");
+                    string foundPath = null;
+                    foreach (var path in candidatePaths)
+                    {
+                        if (!string.IsNullOrEmpty(path) && File.Exists(path))
+                        {
+                            foundPath = path;
+                            break;
+                        }
+                    }
+
+                    if (foundPath != null)
+                    {
+                        string json = File.ReadAllText(foundPath, Encoding.UTF8);
+                        ParseJson(json);
+                        SafeLog("[ImoutoVi] Successfully loaded " + dict.Count + " entries from " + foundPath);
+                    }
+                    else
+                    {
+                        SafeLogWarning("[ImoutoVi] translation_extra.json not found!");
+                    }
                 }
             }
             catch (Exception ex)
