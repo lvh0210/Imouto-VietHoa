@@ -20,6 +20,9 @@ public class InitializeNaninovelEngine : MonoBehaviour
 			{
 				mainCamera.enabled = true;
 				mainCamera.depth = 10;
+				mainCamera.rect = new Rect(0f, 0f, 1f, 1f);
+				mainCamera.clearFlags = CameraClearFlags.SolidColor;
+				mainCamera.backgroundColor = new Color(0.19215687f, 0.3019608f, 0.4745098f, 1.0f);
 			}
 
 			if (!Engine.Initialized)
@@ -41,13 +44,21 @@ public class InitializeNaninovelEngine : MonoBehaviour
 						camMgr.Camera.enabled = false;
 					}
 
+					bool isTitle = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name == "Title";
 					Camera uICamera = camMgr.UICamera;
-					if (uICamera != null && mainCamera != null)
+					if (uICamera != null)
 					{
-						var additionalData = mainCamera.GetComponent<UniversalAdditionalCameraData>();
-						if (additionalData != null && !additionalData.cameraStack.Contains(uICamera))
+						if (isTitle)
 						{
-							additionalData.cameraStack.Add(uICamera);
+							uICamera.enabled = false;
+						}
+						else if (mainCamera != null)
+						{
+							var additionalData = mainCamera.GetComponent<UniversalAdditionalCameraData>();
+							if (additionalData != null && !additionalData.cameraStack.Contains(uICamera))
+							{
+								additionalData.cameraStack.Add(uICamera);
+							}
 						}
 					}
 				}

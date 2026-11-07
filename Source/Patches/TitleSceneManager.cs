@@ -8,20 +8,7 @@ namespace Title
 	{
 		protected override async UniTask Start()
 		{
-			try
-			{
-				await base.Start();
-			}
-			catch (System.Exception ex)
-			{
-				Debug.LogWarning("[Title.SceneManager] base.Start warning: " + ex.Message);
-			}
-
-			try
-			{
-				RegisterEvent();
-			}
-			catch { }
+			ForceEnsureTitleVisible();
 
 			// Make sure main Camera is active and high depth
 			var mainCam = Camera.main;
@@ -45,12 +32,28 @@ namespace Title
 			}
 			catch { }
 
-			// Safety fallback: guarantee Title screen is visible within 1.0 second
+			try
+			{
+				await base.Start();
+			}
+			catch (System.Exception ex)
+			{
+				Debug.LogWarning("[Title.SceneManager] base.Start warning: " + ex.Message);
+			}
+
+			try
+			{
+				RegisterEvent();
+			}
+			catch { }
+
+			ForceEnsureTitleVisible();
+			Invoke(nameof(ForceEnsureTitleVisible), 0.5f);
 			Invoke(nameof(ForceEnsureTitleVisible), 1.0f);
 
-			await UniTask.Delay(500);
+			await UniTask.Delay(100);
 			Sequence sequence = DOTween.Sequence();
-			sequence.Append(FadeIn(1f));
+			sequence.Append(FadeIn(0.5f));
 			sequence.OnComplete(() =>
 			{
 				SousaKinshi(kinshi: false);
@@ -59,9 +62,66 @@ namespace Title
 			AudioManager.PlayBGM.Title();
 		}
 
+		private void Update()
+		{
+			ForceEnsureTitleVisible();
+		}
+
 		private void ForceEnsureTitleVisible()
 		{
 			ForceDismissBlackScreen();
+			DismissLoadingUI();
+
+			var mainCam = Camera.main;
+			if (mainCam != null)
+			{
+				mainCam.enabled = true;
+				mainCam.clearFlags = CameraClearFlags.SolidColor;
+				mainCam.backgroundColor = new Color(0.19215687f, 0.3019608f, 0.4745098f, 1.0f);
+				mainCam.allowHDR = false;
+				mainCam.allowMSAA = false;
+				mainCam.depth = 10;
+
+				var addData = mainCam.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
+				if (addData != null)
+				{
+					if (addData.cameraStack != null && addData.cameraStack.Count > 0)
+					{
+						addData.cameraStack.Clear();
+					}
+					addData.renderPostProcessing = false;
+					addData.dithering = false;
+				}
+			}
+
+			try
+			{
+				if (Engine.Initialized)
+				{
+					var camMgr = Engine.GetService<ICameraManager>();
+					if (camMgr != null)
+					{
+						if (camMgr.Camera != null) camMgr.Camera.enabled = false;
+						if (camMgr.UICamera != null) camMgr.UICamera.enabled = false;
+					}
+					var uiManager = Engine.GetService<IUIManager>();
+					if (uiManager != null)
+					{
+						var loadingUI = uiManager.GetUI("LoadingUI");
+						if (loadingUI != null)
+						{
+							loadingUI.Hide();
+							loadingUI.Visible = false;
+							var mb = loadingUI as MonoBehaviour;
+							if (mb != null && mb.gameObject != null)
+							{
+								mb.gameObject.SetActive(false);
+							}
+						}
+					}
+				}
+			}
+			catch { }
 		}
 
 		private void RegisterEvent()

@@ -15,8 +15,8 @@ public class StartupInitializer : MonoBehaviour
 
 	private void Start()
 	{
-		// Fallback safety guard: If initialization hangs or takes longer than 8 seconds, force load Title scene!
-		Invoke(nameof(ForceLoadTitle), 8.0f);
+		// Fallback safety guard: If initialization hangs or takes longer than 2.5 seconds, force load Title scene!
+		Invoke(nameof(ForceLoadTitle), 2.5f);
 		Initialize();
 	}
 
@@ -28,7 +28,15 @@ public class StartupInitializer : MonoBehaviour
 			Debug.LogWarning("[StartupInitializer] Timeout fallback triggered! Force loading Title scene.");
 			try
 			{
-				if (mainCamera != null) mainCamera.enabled = true;
+				if (mainCamera != null)
+				{
+					mainCamera.enabled = true;
+					mainCamera.clearFlags = CameraClearFlags.SolidColor;
+					mainCamera.backgroundColor = new Color(0.19215687f, 0.3019608f, 0.4745098f, 1.0f);
+					mainCamera.allowHDR = false;
+					mainCamera.allowMSAA = false;
+				}
+				SceneMaster.DismissLoadingUI();
 			}
 			catch { }
 			SceneManager.LoadScene("Title");
@@ -56,6 +64,7 @@ public class StartupInitializer : MonoBehaviour
 		}
 		catch { }
 
+#if !UNITY_ANDROID
 		try
 		{
 			Debug.Log("[StartupInitializer] Initializing Addressables...");
@@ -66,12 +75,21 @@ public class StartupInitializer : MonoBehaviour
 		{
 			Debug.LogWarning("[StartupInitializer] Addressables.InitializeAsync warning: " + ex.Message);
 		}
+#endif
 
 		try
 		{
 			Debug.Log("[StartupInitializer] Setting locale: " + currentLanguage);
-			LocalizationSettings.SelectedLocale = Locale.CreateLocale(currentLanguage);
-			await LocalizationSettings.InitializationOperation.Task;
+			var targetLocale = Locale.CreateLocale(currentLanguage);
+			LocalizationSettings.SelectedLocale = targetLocale;
+			if (!LocalizationSettings.InitializationOperation.IsDone)
+			{
+				await LocalizationSettings.InitializationOperation.Task;
+			}
+			if (LocalizationSettings.SelectedLocale == null)
+			{
+				LocalizationSettings.SelectedLocale = targetLocale;
+			}
 		}
 		catch (Exception ex)
 		{
@@ -116,9 +134,20 @@ public class StartupInitializer : MonoBehaviour
 
 		try
 		{
-			if (mainCamera != null) mainCamera.enabled = true;
+			if (mainCamera != null)
+			{
+				mainCamera.enabled = true;
+				mainCamera.clearFlags = CameraClearFlags.SolidColor;
+				mainCamera.backgroundColor = new Color(0.19215687f, 0.3019608f, 0.4745098f, 1.0f);
+				mainCamera.allowHDR = false;
+				mainCamera.allowMSAA = false;
+			}
 			var cam = Engine.GetService<ICameraManager>();
-			if (cam != null && cam.Camera != null) cam.Camera.enabled = false;
+			if (cam != null)
+			{
+				if (cam.Camera != null) cam.Camera.enabled = false;
+				if (cam.UICamera != null) cam.UICamera.enabled = false;
+			}
 			var printer = Engine.GetService<ITextPrinterManager>();
 			if (printer != null) printer.BaseRevealSpeed = PlayerData.Settings.revealSpeed;
 			Application.runInBackground = PlayerData.Settings.runInBackground;
@@ -135,6 +164,11 @@ public class StartupInitializer : MonoBehaviour
 			titleLoaded = true;
 			CancelInvoke(nameof(ForceLoadTitle));
 			Debug.Log("[StartupInitializer] Transitioning to Title scene!");
+			try
+			{
+				SceneMaster.DismissLoadingUI();
+			}
+			catch { }
 			SceneManager.LoadScene("Title");
 		}
 	}

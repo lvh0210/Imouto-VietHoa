@@ -143,14 +143,35 @@ namespace ImoutoVi
             try { UnityEngine.Debug.LogWarning(msg); } catch { }
         }
 
+        private static readonly string[] VnSigns = new string[]
+        {
+            "aAeEoOuUiIdDyY",
+            "áàạảãâấầậẩẫăắằặẳẵ",
+            "ÁÀẠẢÃÂẤẦẬẨẪĂẮẰẶẲẴ",
+            "éèẹẻẽêếềệểễ",
+            "ÉÈẸẺẼÊẾỀỆỂỄ",
+            "óòọỏõôốồộổỗơớờợởỡ",
+            "ÓÒỌỎÕÔỐỒỘỔỖƠỚỜỢỞỠ",
+            "úùụủũưứừựửữ",
+            "ÚÙỤỦŨƯỨỪỰỬỮ",
+            "íìịỉĩ",
+            "ÍÌỊỈĨ",
+            "đ",
+            "Đ",
+            "ýỳỵỷỹ",
+            "ÝỲỴỶỸ"
+        };
+
         public static string SanitizeFont(string text)
         {
             if (string.IsNullOrEmpty(text)) return text;
-            if (text.IndexOf('ẫ') >= 0) text = text.Replace('ẫ', 'â');
-            if (text.IndexOf('Ẫ') >= 0) text = text.Replace('Ẫ', 'Â');
-            if (text.IndexOf('Ư') >= 0) text = text.Replace('Ư', 'U');
-            if (text.IndexOf("Ứm") >= 0) text = text.Replace("Ứm", "Um");
-            if (text.IndexOf("Ứ\"m") >= 0) text = text.Replace("Ứ\"m", "Um");
+            for (int i = 1; i < VnSigns.Length; i++)
+            {
+                for (int j = 0; j < VnSigns[i].Length; j++)
+                {
+                    text = text.Replace(VnSigns[i][j], VnSigns[0][i - 1]);
+                }
+            }
             return text;
         }
 
@@ -567,17 +588,46 @@ namespace ImoutoVi
                 isTranslating = true;
                 try
                 {
+                    EnsureStaticFont(tmp.font);
                     string trans = Translate(tmp.text);
                     if (!string.Equals(trans, tmp.text, StringComparison.Ordinal))
                     {
                         tmp.text = trans;
                     }
                 }
+                catch (Exception ex)
+                {
+                    SafeLogWarning("[ImoutoVi] OnTmProTextChanged exception: " + ex.Message);
+                }
                 finally
                 {
                     isTranslating = false;
                 }
             }
+        }
+
+        public static void EnsureStaticFont(TMPro.TMP_FontAsset font)
+        {
+            if (font == null) return;
+            try
+            {
+                if (font.atlasPopulationMode != TMPro.AtlasPopulationMode.Static)
+                {
+                    font.atlasPopulationMode = TMPro.AtlasPopulationMode.Static;
+                }
+                if (font.fallbackFontAssetTable != null && font.fallbackFontAssetTable.Count > 0)
+                {
+                    for (int i = 0; i < font.fallbackFontAssetTable.Count; i++)
+                    {
+                        var fb = font.fallbackFontAssetTable[i];
+                        if (fb != null && fb.atlasPopulationMode != TMPro.AtlasPopulationMode.Static)
+                        {
+                            fb.atlasPopulationMode = TMPro.AtlasPopulationMode.Static;
+                        }
+                    }
+                }
+            }
+            catch { }
         }
 
         public static void LogMiss(string text)

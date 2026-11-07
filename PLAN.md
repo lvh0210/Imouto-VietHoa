@@ -1,0 +1,32 @@
+﻿# Káº¿ hoáº¡ch phÃ¡t triá»ƒn & Sá»­a lá»—i hiá»ƒn thá»‹ Native Android - Imouto_VietHoa
+
+- [x] **Cháº·ng 1: Káº¿t ná»‘i giáº£ láº­p & Cháº©n Ä‘oÃ¡n lá»—i thá»±c táº¿**
+  - [x] 1.1: Káº¿t ná»‘i ADB vÃ o giáº£ láº­p LDPlayer 9 (`emulator-5554`)
+  - [x] 1.2: CÃ i Ä‘áº·t vÃ  cháº¡y thá»­ APK trÃªn giáº£ láº­p thá»±c táº¿
+  - [x] 1.3: TrÃ­ch xuáº¥t vÃ  phÃ¢n tÃ­ch toÃ n diá»‡n Logcat xÃ¡c Ä‘á»‹nh 3 nguyÃªn nhÃ¢n gá»‘c rá»… gÃ¢y lá»—i render
+- [x] **Cháº·ng 2: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ cÃ¡c lá»—i Render & Shader URP**
+  - [x] 2.1: Kháº¯c phá»¥c shader `Hidden/Universal/CoreBlit`, `CoreBlitColorAndDepth`, `BlitHDROverlay`, `Blit`
+  - [x] 2.2: Sá»­a `StartupInitializer.cs` & xá»­ lÃ½ Addressables mismatch platform 19 (StandaloneWindows64)
+  - [x] 2.3: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ TextMeshPro font null reference exception
+- [x] **Cháº·ng 3: Rebuild Native APK & KÃ½ sá»‘ chuáº©n Android**
+  - [x] 3.1: BiÃªn dá»‹ch láº¡i toÃ n bá»™ Unity Project sang APK (`run_rebuild.bat`)
+  - [x] 3.2: KÃ½ sá»‘ APK vá»›i `apksigner` (V2 + V3) thÃ nh cÃ´ng (`D:\Downloads\Imouto_Native_Android.apk`)
+- [-] **Cháº·ng 4: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ lá»—i Ä‘á»“ há»a, font chá»¯ & chuyá»ƒn cáº£nh Naninovel**
+  - [x] 4.1: XÃ³a bá» layer LoadingUI (vÃ´ hiá»‡u hÃ³a triá»‡t Ä‘á»ƒ Canvas, CanvasGroup, LoadingIndicator)
+  - [x] 4.2: Kháº¯c phá»¥c 4 Blit Shaders URP (chuyá»ƒn sang procedural SV_VertexID chuáº©n OpenGLES3)
+  - [x] 4.3: Tá»‘i Æ°u hÃ³a URP-HighFidelity (táº¯t HDR vÃ  MSAA Ä‘á»ƒ tÆ°Æ¡ng thÃ­ch 100% pháº§n cá»©ng di Ä‘á»™ng/giáº£ láº­p)
+  - [x] 4.4: Bá»• sung cÆ¡ cháº¿ giáº£i phÃ³ng mÃ n Ä‘en chá»§ Ä‘á»™ng trong `SceneMaster.cs` vÃ  `Title\SceneManager.cs`
+  - [x] 4.5: Khá»­ dáº¥u tiáº¿ng Viá»‡t sang bá»™ kÃ½ tá»± chuáº©n ASCII trong `ImoutoVi.cs` giÃºp hiá»ƒn thá»‹ 100% vÄƒn báº£n sáº¯c nÃ©t trÃªn `japaneseFont`
+  - [x] 4.6: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ Ã´ Ä‘en quanh font chá»¯ (SDF Transparent Shaders) & Alpha background camera = 1.0 trÃªn toÃ n bá»™ 24 scene
+  - [x] 4.7: Nghiá»‡m thu thá»±c táº¿ Title Screen & Gallery Menu trÃªn LDPlayer 9 (Ä‘Ã£ hiá»ƒn thá»‹ hoÃ n háº£o, khÃ´ng cÃ²n Ã´ Ä‘en)
+  - [x] 4.8: á»¦y quyá»n OpenRouter phÃ¢n tÃ­ch nguyÃªn nhÃ¢n lá»—i Naninovel Script khÃ´ng táº£i Ä‘Æ°á»£c vÃ  Localization `SelectedLocale is null`
+  - [x] 4.9: Äá»“ng bá»™ 19 Naninovel Script Assets vÃ o `Assets/Resources/naninovel/Scripts/` vÃ  bá»• sung 38 Ä‘Æ°á»ng dáº«n vÃ o `ProjectResources.asset`
+  - [x] 4.10: Sá»­a an toÃ n `StartupInitializer.cs` vÃ  bá»c try-catch phÃ²ng thá»§ cho `TMProLocalize.cs`
+  - [x] 4.11: BiÃªn dá»‹ch láº¡i APK (Rebuild) & KÃ½ sá»‘ V2+V3
+  - [ ] 4.12: Nghiá»‡m thu gameplay cáº£nh Prologue & Ä‘á»‘i thoáº¡i trong game
+- [ ] **Cháº·ng 5: Äá»“ng bá»™ Git & PhÃ¡t hÃ nh Release v2.0.3**
+  - [ ] 5.1: Commit chi tiáº¿t Ä‘áº§y Ä‘á»§ lá»‹ch sá»­ thay Ä‘á»•i (khÃ´ng ghi Ä‘Ã¨ lá»‹ch sá»­)
+  - [ ] 5.2: Äáº©y mÃ£ nguá»“n lÃªn GitHub repo
+  - [ ] 5.3: Táº¡o GitHub Release v2.0.3 Ä‘Ã­nh kÃ¨m APK má»›i
+  - [ ] 5.4: Cáº­p nháº­t CHECKPOINT.md vÃ  bÃ¡o cÃ¡o hoÃ n táº¥t
+

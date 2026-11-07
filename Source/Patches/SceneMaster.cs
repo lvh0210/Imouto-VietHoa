@@ -18,12 +18,88 @@ public abstract class SceneMaster : MonoBehaviour
 	protected virtual void Awake()
 	{
 		StaticManagers.CurrentSceneManager = this;
-		if (black != null)
+		DismissLoadingUI();
+		ForceDismissBlackScreen();
+		Invoke(nameof(ForceDismissBlackScreen), 0.5f);
+		Invoke(nameof(ForceDismissBlackScreen), 1.5f);
+	}
+
+	public static void DismissLoadingUI()
+	{
+		try
 		{
-			black.gameObject.SetActive(true);
+			var canvases = UnityEngine.Object.FindObjectsOfType<Canvas>(true);
+			if (canvases != null)
+			{
+				for (int i = 0; i < canvases.Length; i++)
+				{
+					var c = canvases[i];
+					if (c != null && c.name.IndexOf("Loading", StringComparison.OrdinalIgnoreCase) >= 0)
+					{
+						c.enabled = false;
+						c.sortingOrder = -100;
+						c.gameObject.SetActive(false);
+					}
+				}
+			}
+
+			var canvasGroups = UnityEngine.Object.FindObjectsOfType<CanvasGroup>(true);
+			if (canvasGroups != null)
+			{
+				for (int i = 0; i < canvasGroups.Length; i++)
+				{
+					var cg = canvasGroups[i];
+					if (cg != null && (cg.name.IndexOf("Loading", StringComparison.OrdinalIgnoreCase) >= 0 ||
+						(cg.transform.root != null && cg.transform.root.name.IndexOf("Loading", StringComparison.OrdinalIgnoreCase) >= 0)))
+					{
+						cg.alpha = 0f;
+						cg.blocksRaycasts = false;
+						cg.interactable = false;
+						cg.gameObject.SetActive(false);
+					}
+				}
+			}
+
+			int sc = UnityEngine.SceneManagement.SceneManager.sceneCount;
+			for (int i = 0; i < sc; i++)
+			{
+				var scene = UnityEngine.SceneManagement.SceneManager.GetSceneAt(i);
+				if (scene.isLoaded)
+				{
+					var roots = scene.GetRootGameObjects();
+					for (int r = 0; r < roots.Length; r++)
+					{
+						var root = roots[r];
+						if (root != null && root.name.IndexOf("Loading", StringComparison.OrdinalIgnoreCase) >= 0)
+						{
+							root.SetActive(false);
+							UnityEngine.Object.Destroy(root);
+						}
+					}
+				}
+			}
+
+			if (Engine.Initialized)
+			{
+				var uiManager = Engine.GetService<IUIManager>();
+				if (uiManager != null)
+				{
+					var loadingUI = uiManager.GetUI("LoadingUI");
+					if (loadingUI != null)
+					{
+						loadingUI.Hide();
+						loadingUI.Visible = false;
+						var mb = loadingUI as MonoBehaviour;
+						if (mb != null && mb.gameObject != null)
+						{
+							mb.gameObject.SetActive(false);
+							UnityEngine.Object.Destroy(mb.gameObject);
+						}
+					}
+				}
+			}
 		}
-		// Failsafe: After 2.0 seconds, force the black overlay off so screen is NEVER stuck black
-		Invoke(nameof(ForceDismissBlackScreen), 2.0f);
+		catch { }
 	}
 
 	protected void ForceDismissBlackScreen()
@@ -34,23 +110,63 @@ public abstract class SceneMaster : MonoBehaviour
 			black.blocksRaycasts = false;
 			black.gameObject.SetActive(false);
 		}
+		try
+		{
+			var canvasGroups = UnityEngine.Object.FindObjectsOfType<CanvasGroup>(true);
+			if (canvasGroups != null)
+			{
+				for (int i = 0; i < canvasGroups.Length; i++)
+				{
+					var cg = canvasGroups[i];
+					if (cg != null && (cg.name == "black" || cg.name == "FadeCanvas" || cg.name == "halfBlack"))
+					{
+						cg.alpha = 0f;
+						cg.blocksRaycasts = false;
+					}
+				}
+			}
+		}
+		catch { }
+		DismissLoadingUI();
+		try
+		{
+			var allCanvases = UnityEngine.Object.FindObjectsOfType<Canvas>(true);
+			if (allCanvases != null)
+			{
+				for (int i = 0; i < allCanvases.Length; i++)
+				{
+					var c = allCanvases[i];
+					if (c != null && c.renderMode != RenderMode.ScreenSpaceOverlay)
+					{
+						c.renderMode = RenderMode.ScreenSpaceOverlay;
+					}
+				}
+			}
+		}
+		catch { }
 	}
 
 	protected virtual async Naninovel.UniTask Start()
 	{
+		DismissLoadingUI();
+		ForceDismissBlackScreen();
 		SaveManager.SaveSystemDataIfNeeded();
 		try
 		{
-			if (!Engine.Initialized)
+			var mainCam = Camera.main;
+			if (mainCam != null)
 			{
-				await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => Engine.GetService<ICameraManager>() != null && Engine.GetService<ICameraManager>().Camera != null).Timeout(TimeSpan.FromSeconds(3));
-				Camera naniCamera = Engine.GetService<ICameraManager>()?.Camera;
-				if (naniCamera != null)
-				{
-					await Cysharp.Threading.Tasks.UniTask.WaitUntil(() => !naniCamera.enabled).Timeout(TimeSpan.FromSeconds(2));
-				}
+				mainCam.clearFlags = CameraClearFlags.SolidColor;
+				mainCam.backgroundColor = new Color(0.19215687f, 0.3019608f, 0.4745098f, 1.0f);
+				mainCam.rect = new Rect(0f, 0f, 1f, 1f);
+				mainCam.allowHDR = false;
+				mainCam.allowMSAA = false;
 			}
-			else
+		}
+		catch { }
+		try
+		{
+			if (Engine.Initialized)
 			{
 				var camMgr = Engine.GetService<ICameraManager>();
 				if (camMgr != null && camMgr.Camera != null)
@@ -65,11 +181,13 @@ public abstract class SceneMaster : MonoBehaviour
 		{
 			try
 			{
-				await Naninovel.UniTask.WhenAll(OnNaninovelInitializeProccess());
+				await Naninovel.UniTask.WhenAll(OnNaninovelInitializeProccess()).Timeout(TimeSpan.FromSeconds(1));
 			}
 			catch { }
 		}
-		await Naninovel.UniTask.Delay(100);
+		await Naninovel.UniTask.Delay(50);
+		DismissLoadingUI();
+		ForceDismissBlackScreen();
 		OnSceneInitialized?.Invoke();
 	}
 
@@ -86,6 +204,7 @@ public abstract class SceneMaster : MonoBehaviour
 		Sequence sequence = DOTween.Sequence();
 		sequence.OnStart(() =>
 		{
+			ForceDismissBlackScreen();
 		});
 		if (black != null)
 		{
