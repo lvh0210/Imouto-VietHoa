@@ -1,32 +1,32 @@
-﻿# Káº¿ hoáº¡ch phÃ¡t triá»ƒn & Sá»­a lá»—i hiá»ƒn thá»‹ Native Android - Imouto_VietHoa
+# Kế hoạch phát triển & Sửa lỗi hiển thị Native Android - Imouto_VietHoa
 
-- [x] **Cháº·ng 1: Káº¿t ná»‘i giáº£ láº­p & Cháº©n Ä‘oÃ¡n lá»—i thá»±c táº¿**
-  - [x] 1.1: Káº¿t ná»‘i ADB vÃ o giáº£ láº­p LDPlayer 9 (`emulator-5554`)
-  - [x] 1.2: CÃ i Ä‘áº·t vÃ  cháº¡y thá»­ APK trÃªn giáº£ láº­p thá»±c táº¿
-  - [x] 1.3: TrÃ­ch xuáº¥t vÃ  phÃ¢n tÃ­ch toÃ n diá»‡n Logcat xÃ¡c Ä‘á»‹nh 3 nguyÃªn nhÃ¢n gá»‘c rá»… gÃ¢y lá»—i render
-- [x] **Cháº·ng 2: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ cÃ¡c lá»—i Render & Shader URP**
-  - [x] 2.1: Kháº¯c phá»¥c shader `Hidden/Universal/CoreBlit`, `CoreBlitColorAndDepth`, `BlitHDROverlay`, `Blit`
-  - [x] 2.2: Sá»­a `StartupInitializer.cs` & xá»­ lÃ½ Addressables mismatch platform 19 (StandaloneWindows64)
-  - [x] 2.3: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ TextMeshPro font null reference exception
-- [x] **Cháº·ng 3: Rebuild Native APK & KÃ½ sá»‘ chuáº©n Android**
-  - [x] 3.1: BiÃªn dá»‹ch láº¡i toÃ n bá»™ Unity Project sang APK (`run_rebuild.bat`)
-  - [x] 3.2: KÃ½ sá»‘ APK vá»›i `apksigner` (V2 + V3) thÃ nh cÃ´ng (`D:\Downloads\Imouto_Native_Android.apk`)
-- [-] **Cháº·ng 4: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ lá»—i Ä‘á»“ há»a, font chá»¯ & chuyá»ƒn cáº£nh Naninovel**
-  - [x] 4.1: XÃ³a bá» layer LoadingUI (vÃ´ hiá»‡u hÃ³a triá»‡t Ä‘á»ƒ Canvas, CanvasGroup, LoadingIndicator)
-  - [x] 4.2: Kháº¯c phá»¥c 4 Blit Shaders URP (chuyá»ƒn sang procedural SV_VertexID chuáº©n OpenGLES3)
-  - [x] 4.3: Tá»‘i Æ°u hÃ³a URP-HighFidelity (táº¯t HDR vÃ  MSAA Ä‘á»ƒ tÆ°Æ¡ng thÃ­ch 100% pháº§n cá»©ng di Ä‘á»™ng/giáº£ láº­p)
-  - [x] 4.4: Bá»• sung cÆ¡ cháº¿ giáº£i phÃ³ng mÃ n Ä‘en chá»§ Ä‘á»™ng trong `SceneMaster.cs` vÃ  `Title\SceneManager.cs`
-  - [x] 4.5: Khá»­ dáº¥u tiáº¿ng Viá»‡t sang bá»™ kÃ½ tá»± chuáº©n ASCII trong `ImoutoVi.cs` giÃºp hiá»ƒn thá»‹ 100% vÄƒn báº£n sáº¯c nÃ©t trÃªn `japaneseFont`
-  - [x] 4.6: Kháº¯c phá»¥c triá»‡t Ä‘á»ƒ Ã´ Ä‘en quanh font chá»¯ (SDF Transparent Shaders) & Alpha background camera = 1.0 trÃªn toÃ n bá»™ 24 scene
-  - [x] 4.7: Nghiá»‡m thu thá»±c táº¿ Title Screen & Gallery Menu trÃªn LDPlayer 9 (Ä‘Ã£ hiá»ƒn thá»‹ hoÃ n háº£o, khÃ´ng cÃ²n Ã´ Ä‘en)
-  - [x] 4.8: á»¦y quyá»n OpenRouter phÃ¢n tÃ­ch nguyÃªn nhÃ¢n lá»—i Naninovel Script khÃ´ng táº£i Ä‘Æ°á»£c vÃ  Localization `SelectedLocale is null`
-  - [x] 4.9: Äá»“ng bá»™ 19 Naninovel Script Assets vÃ o `Assets/Resources/naninovel/Scripts/` vÃ  bá»• sung 38 Ä‘Æ°á»ng dáº«n vÃ o `ProjectResources.asset`
-  - [x] 4.10: Sá»­a an toÃ n `StartupInitializer.cs` vÃ  bá»c try-catch phÃ²ng thá»§ cho `TMProLocalize.cs`
-  - [x] 4.11: BiÃªn dá»‹ch láº¡i APK (Rebuild) & KÃ½ sá»‘ V2+V3
-  - [ ] 4.12: Nghiá»‡m thu gameplay cáº£nh Prologue & Ä‘á»‘i thoáº¡i trong game
-- [ ] **Cháº·ng 5: Äá»“ng bá»™ Git & PhÃ¡t hÃ nh Release v2.0.3**
-  - [ ] 5.1: Commit chi tiáº¿t Ä‘áº§y Ä‘á»§ lá»‹ch sá»­ thay Ä‘á»•i (khÃ´ng ghi Ä‘Ã¨ lá»‹ch sá»­)
-  - [ ] 5.2: Äáº©y mÃ£ nguá»“n lÃªn GitHub repo
-  - [ ] 5.3: Táº¡o GitHub Release v2.0.3 Ä‘Ã­nh kÃ¨m APK má»›i
-  - [ ] 5.4: Cáº­p nháº­t CHECKPOINT.md vÃ  bÃ¡o cÃ¡o hoÃ n táº¥t
-
+- [x] **Chặng 1: Kết nối giả lập & Chẩn đoán lỗi thực tế**
+  - [x] 1.1: Kết nối ADB vào giả lập LDPlayer 9 (`emulator-5554`)
+  - [x] 1.2: Cài đặt và chạy thử APK trên giả lập thực tế
+  - [x] 1.3: Trích xuất và phân tích toàn diện Logcat xác định 3 nguyên nhân gốc rễ gây lỗi render
+- [x] **Chặng 2: Khắc phục triệt để các lỗi Render & Shader URP**
+  - [x] 2.1: Khắc phục shader `Hidden/Universal/CoreBlit`, `CoreBlitColorAndDepth`, `BlitHDROverlay`, `Blit`
+  - [x] 2.2: Sửa `StartupInitializer.cs` & xử lý Addressables mismatch platform 19 (StandaloneWindows64)
+  - [x] 2.3: Khắc phục triệt để TextMeshPro font null reference exception
+- [x] **Chặng 3: Rebuild Native APK & Ký số chuẩn Android**
+  - [x] 3.1: Biên dịch lại toàn bộ Unity Project sang APK (`run_rebuild.bat`)
+  - [x] 3.2: Ký số APK với `apksigner` (V2 + V3) thành công (`D:\Downloads\Imouto_Native_Android.apk`)
+- [-] **Chặng 4: Khắc phục triệt để lỗi 2 (Màn đen chơi mới) & lỗi 3 (Kẹt bóng thoại thư viện)**
+  - [x] 4.1: Xóa bỏ layer LoadingUI (vô hiệu hóa triệt để Canvas, CanvasGroup, LoadingIndicator)
+  - [x] 4.2: Khắc phục 4 Blit Shaders URP (chuyển sang procedural SV_VertexID chuẩn OpenGLES3)
+  - [x] 4.3: Tối ưu hóa URP-HighFidelity (tắt HDR và MSAA để tương thích 100% phần cứng di động/giả lập)
+  - [x] 4.4: Bổ sung cơ chế giải phóng màn đen chủ động trong `SceneMaster.cs` và `Title\SceneManager.cs`
+  - [x] 4.5: Khử dấu tiếng Việt sang bộ ký tự chuẩn ASCII trong `ImoutoVi.cs` giúp hiển thị 100% văn bản sắc nét trên `japaneseFont`
+  - [x] 4.6: Khắc phục triệt để ô đen quanh font chữ (SDF Transparent Shaders) & Alpha background camera = 1.0 trên toàn bộ 24 scene
+  - [x] 4.7: Đồng bộ 19 Naninovel Script Assets vào `Assets/Resources/naninovel/Scripts/` và bổ sung 38 đường dẫn vào `ProjectResources.asset`
+  - [x] 4.8: Bổ sung 4 Prefab Live2D Characters (`妹`, `店`, `Sister`, `Tenin`) vào `Assets/Resources/Characters/` và đăng ký vào `ProjectResources.asset`
+  - [x] 4.9: Nâng cấp `Live2DCharacter.cs` với cơ chế dự phòng nạp trực tiếp qua `Resources.Load`
+  - [x] 4.10: Tinh chỉnh `SwitchToNovelMode.cs` kích hoạt Naninovel Camera, UICamera và hạ màn đen `black`
+  - [x] 4.11: Gỡ bỏ hoàn toàn việc ép ScreenSpaceOverlay trong `SceneMaster.cs` và `Title\SceneManager.cs` (khắc phục lỗi bóng thoại trắng che phủ toàn màn hình ở lỗi 3)
+  - [-] 4.12: Biên dịch lại APK (Rebuild Native Android APK)
+  - [ ] 4.13: Ký số APK với `apksigner` (V2 + V3)
+  - [ ] 4.14: Cài đặt lên LDPlayer 9 và kiểm thử thực tế Lỗi 2 (Chơi từ đầu) và Lỗi 3 (Phát lại Thư viện)
+- [ ] **Chặng 5: Đồng bộ Git & Nghiệm thu hoàn tất**
+  - [ ] 5.1: Commit chi tiết đầy đủ lịch sử thay đổi vào Git
+  - [ ] 5.2: Đẩy mã nguồn lên GitHub repo
+  - [ ] 5.3: Cập nhật CHECKPOINT.md và báo cáo hoàn tất
