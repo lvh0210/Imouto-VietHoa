@@ -3,13 +3,14 @@ using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Naninovel;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
 public abstract class SceneMaster : MonoBehaviour
 {
 	public CanvasGroup black;
 
-	private AsyncOperation async;
+	protected AsyncOperation async;
 
 	public event Func<Naninovel.UniTask> OnNaninovelInitializeProccess;
 
@@ -118,7 +119,7 @@ public abstract class SceneMaster : MonoBehaviour
 				for (int i = 0; i < canvasGroups.Length; i++)
 				{
 					var cg = canvasGroups[i];
-					if (cg != null && (cg.name == "black" || cg.name == "FadeCanvas" || cg.name == "halfBlack"))
+					if (cg != null && (cg.name == "black" || cg.name == "FadeCanvas"))
 					{
 						cg.alpha = 0f;
 						cg.blocksRaycasts = false;
@@ -128,22 +129,6 @@ public abstract class SceneMaster : MonoBehaviour
 		}
 		catch { }
 		DismissLoadingUI();
-		try
-		{
-			var allCanvases = UnityEngine.Object.FindObjectsOfType<Canvas>(true);
-			if (allCanvases != null)
-			{
-				for (int i = 0; i < allCanvases.Length; i++)
-				{
-					var c = allCanvases[i];
-					if (c != null && c.renderMode != RenderMode.ScreenSpaceOverlay)
-					{
-						c.renderMode = RenderMode.ScreenSpaceOverlay;
-					}
-				}
-			}
-		}
-		catch { }
 	}
 
 	protected virtual async Naninovel.UniTask Start()
@@ -162,17 +147,38 @@ public abstract class SceneMaster : MonoBehaviour
 				mainCam.allowHDR = false;
 				mainCam.allowMSAA = false;
 			}
+
+			var allCams = Camera.allCameras;
+			for (int i = 0; i < allCams.Length; i++)
+			{
+				var cam = allCams[i];
+				if (cam != null && cam != mainCam && cam.targetTexture == null)
+				{
+					if (cam.clearFlags == CameraClearFlags.Skybox || cam.clearFlags == CameraClearFlags.SolidColor)
+					{
+						cam.clearFlags = CameraClearFlags.Depth;
+					}
+				}
+			}
 		}
 		catch { }
 		try
 		{
-			if (Engine.Initialized)
+			string currentScene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+			if (currentScene == "Title")
 			{
-				var camMgr = Engine.GetService<ICameraManager>();
-				if (camMgr != null && camMgr.Camera != null)
+				if (Engine.Initialized)
 				{
-					camMgr.Camera.enabled = false;
+					var camMgr = Engine.GetService<ICameraManager>();
+					if (camMgr != null && camMgr.Camera != null)
+					{
+						camMgr.Camera.enabled = false;
+					}
 				}
+			}
+			else
+			{
+				SetupURPCameraStack();
 			}
 		}
 		catch { }
@@ -191,6 +197,75 @@ public abstract class SceneMaster : MonoBehaviour
 		OnSceneInitialized?.Invoke();
 	}
 
+	public static void SetupURPCameraStack()
+	{
+		try
+		{
+			var mainCam = Camera.main;
+			if (mainCam == null)
+			{
+				var cams = Camera.allCameras;
+				for (int i = 0; i < cams.Length; i++)
+				{
+					if (cams[i] != null && cams[i].enabled)
+					{
+						mainCam = cams[i];
+						break;
+					}
+				}
+			}
+			if (mainCam == null) return;
+
+			var baseData = mainCam.GetComponent<UniversalAdditionalCameraData>();
+			if (baseData == null)
+			{
+				baseData = mainCam.gameObject.AddComponent<UniversalAdditionalCameraData>();
+			}
+			baseData.renderType = CameraRenderType.Base;
+
+			if (Engine.Initialized)
+			{
+				var camMgr = Engine.GetService<ICameraManager>();
+				if (camMgr != null)
+				{
+					if (camMgr.Camera != null)
+					{
+						var naniData = camMgr.Camera.GetComponent<UniversalAdditionalCameraData>();
+						if (naniData == null)
+						{
+							naniData = camMgr.Camera.gameObject.AddComponent<UniversalAdditionalCameraData>();
+						}
+						naniData.renderType = CameraRenderType.Overlay;
+						if (baseData.cameraStack != null && !baseData.cameraStack.Contains(camMgr.Camera))
+						{
+							baseData.cameraStack.Add(camMgr.Camera);
+						}
+						camMgr.Camera.enabled = true;
+					}
+
+					if (camMgr.UICamera != null)
+					{
+						var uiData = camMgr.UICamera.GetComponent<UniversalAdditionalCameraData>();
+						if (uiData == null)
+						{
+							uiData = camMgr.UICamera.gameObject.AddComponent<UniversalAdditionalCameraData>();
+						}
+						uiData.renderType = CameraRenderType.Overlay;
+						if (baseData.cameraStack != null && !baseData.cameraStack.Contains(camMgr.UICamera))
+						{
+							baseData.cameraStack.Add(camMgr.UICamera);
+						}
+						camMgr.UICamera.enabled = true;
+					}
+				}
+			}
+		}
+		catch (Exception ex)
+		{
+			Debug.LogWarning("[SetupURPCameraStack] Warning: " + ex.Message);
+		}
+	}
+
 	public void SousaKinshi(bool kinshi)
 	{
 		if (black != null)
@@ -204,11 +279,19 @@ public abstract class SceneMaster : MonoBehaviour
 		Sequence sequence = DOTween.Sequence();
 		sequence.OnStart(() =>
 		{
-			ForceDismissBlackScreen();
+			if (black != null)
+			{
+				black.gameObject.SetActive(true);
+				black.blocksRaycasts = false;
+			}
 		});
 		if (black != null)
 		{
 			sequence.Append(black.DOFade(0f, fadeTime).SetEase(ease));
+		}
+		else
+		{
+			sequence.AppendInterval(fadeTime);
 		}
 		sequence.OnComplete(() =>
 		{
@@ -231,6 +314,10 @@ public abstract class SceneMaster : MonoBehaviour
 		if (black != null)
 		{
 			sequence.Append(black.DOFade(1f, fadeTime).SetEase(ease));
+		}
+		else
+		{
+			sequence.AppendInterval(fadeTime);
 		}
 		sequence.OnComplete(() =>
 		{
@@ -346,7 +433,17 @@ public abstract class SceneMaster : MonoBehaviour
 
 	protected void TransitionToScene()
 	{
-		async.allowSceneActivation = true;
-		ProgressBarSingleton.Instance.ViewLoading(async);
+		if (async != null)
+		{
+			async.allowSceneActivation = true;
+			try
+			{
+				if (ProgressBarSingleton.Instance != null)
+				{
+					ProgressBarSingleton.Instance.ViewLoading(async);
+				}
+			}
+			catch { }
+		}
 	}
 }

@@ -1,0 +1,3 @@
+[console_scripts]
+cli-anything-imouto = cli_anything.imouto.imouto_cli:main
+imouto = cli_anything.imouto.imouto_cli:main

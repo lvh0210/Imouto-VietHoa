@@ -1,0 +1,21 @@
+{
+  "0": "SceneMaster",
+  "1": "SceneMaster.DismissLoadingUI",
+  "2": "TranslationHook",
+  "3": "TMProLocalize",
+  "4": "StartupInitializer.cs",
+  "5": "TranslationHook",
+  "6": "Source/ImoutoVi.cs",
+  "7": "Quy tắc lưu trữ và quản lý thư mục dự án (Global - All Projects & Chats)",
+  "8": "Dự Án Bản Địa Hóa Tiếng Việt: 妹と過ごす1ヵ月間_Re (One Month with My Sister _Re)",
+  "9": "CameraFixedAspect",
+  "10": "2. Trạng thái & Kết quả kỹ thuật đã đạt được",
+  "11": "extract_ico.py",
+  "12": "Technical Checkpoint - Môi Trường Giả Lập & ADB Testing",
+  "13": "PLAN.md",
+  "14": "fix_all_shaders.ps1",
+  "15": "fix_blit_shaders.ps1",
+  "16": "fix_post_effects.ps1",
+  "17": "fix_remaining_shaders.ps1",
+  "18": "fix_errors.ps1"
+}

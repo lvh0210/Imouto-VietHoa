@@ -1,32 +1,32 @@
-# Kế hoạch phát triển & Sửa lỗi hiển thị Native Android - Imouto_VietHoa
+# Kế Hoạch 2 Tầng Tái Cấu Trúc Dự Án Imouto Mobile Với CLI-Anything & OpenRouter
 
-- [x] **Chặng 1: Kết nối giả lập & Chẩn đoán lỗi thực tế**
-  - [x] 1.1: Kết nối ADB vào giả lập LDPlayer 9 (`emulator-5554`)
-  - [x] 1.2: Cài đặt và chạy thử APK trên giả lập thực tế
-  - [x] 1.3: Trích xuất và phân tích toàn diện Logcat xác định 3 nguyên nhân gốc rễ gây lỗi render
-- [x] **Chặng 2: Khắc phục triệt để các lỗi Render & Shader URP**
-  - [x] 2.1: Khắc phục shader `Hidden/Universal/CoreBlit`, `CoreBlitColorAndDepth`, `BlitHDROverlay`, `Blit`
-  - [x] 2.2: Sửa `StartupInitializer.cs` & xử lý Addressables mismatch platform 19 (StandaloneWindows64)
-  - [x] 2.3: Khắc phục triệt để TextMeshPro font null reference exception
-- [x] **Chặng 3: Rebuild Native APK & Ký số chuẩn Android**
-  - [x] 3.1: Biên dịch lại toàn bộ Unity Project sang APK (`run_rebuild.bat`)
-  - [x] 3.2: Ký số APK với `apksigner` (V2 + V3) thành công (`D:\Downloads\Imouto_Native_Android.apk`)
-- [-] **Chặng 4: Khắc phục triệt để lỗi 2 (Màn đen chơi mới) & lỗi 3 (Kẹt bóng thoại thư viện)**
-  - [x] 4.1: Xóa bỏ layer LoadingUI (vô hiệu hóa triệt để Canvas, CanvasGroup, LoadingIndicator)
-  - [x] 4.2: Khắc phục 4 Blit Shaders URP (chuyển sang procedural SV_VertexID chuẩn OpenGLES3)
-  - [x] 4.3: Tối ưu hóa URP-HighFidelity (tắt HDR và MSAA để tương thích 100% phần cứng di động/giả lập)
-  - [x] 4.4: Bổ sung cơ chế giải phóng màn đen chủ động trong `SceneMaster.cs` và `Title\SceneManager.cs`
-  - [x] 4.5: Khử dấu tiếng Việt sang bộ ký tự chuẩn ASCII trong `ImoutoVi.cs` giúp hiển thị 100% văn bản sắc nét trên `japaneseFont`
-  - [x] 4.6: Khắc phục triệt để ô đen quanh font chữ (SDF Transparent Shaders) & Alpha background camera = 1.0 trên toàn bộ 24 scene
-  - [x] 4.7: Đồng bộ 19 Naninovel Script Assets vào `Assets/Resources/naninovel/Scripts/` và bổ sung 38 đường dẫn vào `ProjectResources.asset`
-  - [x] 4.8: Bổ sung 4 Prefab Live2D Characters (`妹`, `店`, `Sister`, `Tenin`) vào `Assets/Resources/Characters/` và đăng ký vào `ProjectResources.asset`
-  - [x] 4.9: Nâng cấp `Live2DCharacter.cs` với cơ chế dự phòng nạp trực tiếp qua `Resources.Load`
-  - [x] 4.10: Tinh chỉnh `SwitchToNovelMode.cs` kích hoạt Naninovel Camera, UICamera và hạ màn đen `black`
-  - [x] 4.11: Gỡ bỏ hoàn toàn việc ép ScreenSpaceOverlay trong `SceneMaster.cs` và `Title\SceneManager.cs` (khắc phục lỗi bóng thoại trắng che phủ toàn màn hình ở lỗi 3)
-  - [-] 4.12: Biên dịch lại APK (Rebuild Native Android APK)
-  - [ ] 4.13: Ký số APK với `apksigner` (V2 + V3)
-  - [ ] 4.14: Cài đặt lên LDPlayer 9 và kiểm thử thực tế Lỗi 2 (Chơi từ đầu) và Lỗi 3 (Phát lại Thư viện)
-- [ ] **Chặng 5: Đồng bộ Git & Nghiệm thu hoàn tất**
-  - [ ] 5.1: Commit chi tiết đầy đủ lịch sử thay đổi vào Git
-  - [ ] 5.2: Đẩy mã nguồn lên GitHub repo
-  - [ ] 5.3: Cập nhật CHECKPOINT.md và báo cáo hoàn tất
+- [x] **Chặng 1: Khảo sát hiện trạng & Kiểm thử chẩn đoán hệ thống**
+  - [x] 1.1: Quét và kiểm tra tính toàn vẹn của Unity Editor, Android SDK/NDK, Keystore và dự án ExportedProject
+  - [x] 1.2: Kiểm tra tình trạng thư viện Live2D Cubism Core (`libLive2DCubismCore.so`), shaders và scripts
+  - [x] 1.3: Xác định đường dẫn LDPlayer 9 và cơ chế ADB automation
+- [x] **Chặng 2: Xây dựng Bộ công cụ chuẩn CLI-Anything (`cli-anything-imouto`)**
+  - [x] 2.1: Khởi tạo cấu trúc thư mục chuẩn `agent-harness/cli_anything/imouto/` theo HKUDS/CLI-Anything
+  - [x] 2.2: Xây dựng core modules (`config.py`, `project.py`, `session.py`)
+  - [x] 2.3: Xây dựng backend modules (`unity_backend.py`, `signer_backend.py`, `android_backend.py`, `repl_skin.py`)
+  - [x] 2.4: Xây dựng CLI entry point với Click (hỗ trợ one-shot subcommands, `--json` và interactive REPL)
+  - [x] 2.5: Viết `setup.py` và cài đặt package môi trường cục bộ (`pip install -e agent-harness`)
+  - [x] 2.6: Viết bộ test `tests/test_core.py`, lập `TEST.md` và chạy Pytest xác nhận 100% pass (11/11 tests)
+- [x] **Chặng 3: Xử lý triệt để các tồn đọng của Game (Live2D, Shader, Font, Hook)**
+  - [x] 3.1: Tích hợp và đồng bộ thư viện Native `libLive2DCubismCore.so` (arm64-v8a) vào cả 2 vị trí Plugins và kiểm tra meta
+  - [x] 3.2: Kiểm tra và chuẩn hóa Shaders URP tương thích hoàn toàn OpenGL ES 3.0 / Vulkan
+  - [x] 3.3: Tối ưu Font TextMeshPro tiếng Việt và viền hiển thị Title / UI
+  - [x] 3.4: Rà soát Naninovel script & localization hooks, loại bỏ mọi nguy cơ gây kẹt màn hình
+- [x] **Chặng 4: Biên dịch & Ký số tự động bằng CLI-Anything Harness**
+  - [x] 4.1: Chạy biên dịch Unity Android IL2CPP qua lệnh `cli-anything-imouto build` (Thành công 100%, exit code 0)
+  - [x] 4.2: Phân tích log biên dịch, đảm bảo 0 warning chí mạng và 0 error
+  - [x] 4.3: Tự động căn chỉnh zipalign và ký số APK chuẩn V2+V3 qua lệnh `cli-anything-imouto sign` (Đã kiểm tra verify_apk = True)
+- [-] **Chặng 5: Kiểm thử tự động trên OnePlus 7 Pro (End-to-End Verification)**
+  - [x] 5.1: Cài đặt và chạy game thành công trên OnePlus 7 Pro qua ADB
+  - [x] 5.2: Phân tích logcat & screenshot tìm ra nguyên nhân: URP Camera Stack, DOTween inactive freeze, BackGroundCanvas sorting, Live2D P/Invoke, Live2D dummy shader non-URP (magenta artifact), và Mobile Touch PointerUp
+  - [x] 5.3: Vá lỗi toàn diện: Live2D P/Invoke csmGetRenderOrders, SetupURPCameraStack, FadeIn DOTween sequence, ProgressBarSingleton safe checks, Live2D Cubism URP shaders (Unlit & Mask), và UIButtonMaster touch handling
+  - [-] 5.4: Biên dịch lại APK gia tăng và ký số qua `cli-anything-imouto`
+  - [ ] 5.5: Nạp APK vào OnePlus 7 Pro và test thực tế cảnh "Chơi từ đầu" (Live2D & Hội thoại Prologue)
+- [-] **Chặng 6: Hoàn thiện Tài liệu, Sinh SKILL.md & Bàn giao**
+  - [x] 6.1: Sinh `SKILL.md` tự động cho `cli-anything-imouto` (Đã lưu tại canonical và package)
+  - [x] 6.2: Cập nhật `CHECKPOINT.md` và `README.md`
+  - [x] 6.3: Xuất báo cáo tổng kết chi tiết cho người dùng

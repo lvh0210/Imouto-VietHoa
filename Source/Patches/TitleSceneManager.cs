@@ -64,7 +64,10 @@ namespace Title
 
 		private void Update()
 		{
-			ForceEnsureTitleVisible();
+			if (async == null)
+			{
+				ForceEnsureTitleVisible();
+			}
 		}
 
 		private void ForceEnsureTitleVisible()
@@ -81,6 +84,8 @@ namespace Title
 				mainCam.allowHDR = false;
 				mainCam.allowMSAA = false;
 				mainCam.depth = 10;
+				mainCam.rect = new Rect(0f, 0f, 1f, 1f);
+
 
 				var addData = mainCam.GetComponent<UnityEngine.Rendering.Universal.UniversalAdditionalCameraData>();
 				if (addData != null)

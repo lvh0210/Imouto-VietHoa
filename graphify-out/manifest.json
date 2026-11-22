@@ -1,0 +1,140 @@
+{
+  "Data/translation_extra.json": {
+    "mtime": 1793885374.27754,
+    "seen": 1794134481.4489775,
+    "ast_hash": "272ad7f94c8a2c4fbb2c7612a2f0eb0a",
+    "semantic_hash": ""
+  },
+  "Scripts/extract_ico.py": {
+    "mtime": 1793886218.723049,
+    "seen": 1794134481.4489775,
+    "ast_hash": "ef51dfbe65e350a2f5e80083628e2a61",
+    "semantic_hash": ""
+  },
+  "Scripts/fix_all_shaders.ps1": {
+    "mtime": 1793961035.5264215,
+    "seen": 1794134481.4489775,
+    "ast_hash": "24ea4babdb7589c4539e845180e058f2",
+    "semantic_hash": ""
+  },
+  "Scripts/fix_blit_shaders.ps1": {
+    "mtime": 1793961242.8055089,
+    "seen": 1794134481.4489775,
+    "ast_hash": "14289e7be2ea29a07e4a2e0726512443",
+    "semantic_hash": ""
+  },
+  "Scripts/fix_errors.ps1": {
+    "mtime": 1793961115.54177,
+    "seen": 1794134481.4489775,
+    "ast_hash": "1d5181c6b0415691571f7fa2cf93cfb8",
+    "semantic_hash": ""
+  },
+  "Scripts/fix_post_effects.ps1": {
+    "mtime": 1793961262.3212135,
+    "seen": 1794134481.4489775,
+    "ast_hash": "e53b9e25c7d7b89c6a4f62cd0d57b118",
+    "semantic_hash": ""
+  },
+  "Scripts/fix_remaining_shaders.ps1": {
+    "mtime": 1793961090.583033,
+    "seen": 1794134481.4489775,
+    "ast_hash": "6e1551f3861aa7e33d7818f4703b4361",
+    "semantic_hash": ""
+  },
+  "Source/ImoutoVi.cs": {
+    "mtime": 1794065212.2122755,
+    "seen": 1794134481.4489775,
+    "ast_hash": "a970172e709784a010918d4b732e1a69",
+    "semantic_hash": ""
+  },
+  "Source/Patches/Builder.cs": {
+    "mtime": 1793956227.796822,
+    "seen": 1794134481.4489775,
+    "ast_hash": "52deaf88b078df6277a10e03a1ca5149",
+    "semantic_hash": ""
+  },
+  "Source/Patches/CameraFixedAspect.cs": {
+    "mtime": 1794071392.157414,
+    "seen": 1794134481.4489775,
+    "ast_hash": "b3c96c6a1b21dfd844be6ede354acf17",
+    "semantic_hash": ""
+  },
+  "Source/Patches/ImoutoVi.cs": {
+    "mtime": 1794071580.8891678,
+    "seen": 1794134481.4489775,
+    "ast_hash": "1e1ae836b2903ff6373c0053325c8e33",
+    "semantic_hash": ""
+  },
+  "Source/Patches/InitializeNaninovelEngine.cs": {
+    "mtime": 1794071613.8625607,
+    "seen": 1794134481.4489775,
+    "ast_hash": "08b0dace685214b8e833c4d5304a3f42",
+    "semantic_hash": ""
+  },
+  "Source/Patches/SceneManager.cs": {
+    "mtime": 1794071522.0589876,
+    "seen": 1794134481.4489775,
+    "ast_hash": "64aa53d68ef715a260d19439ebc0d7bd",
+    "semantic_hash": ""
+  },
+  "Source/Patches/SceneMaster.cs": {
+    "mtime": 1794073826.502169,
+    "seen": 1794134481.4489775,
+    "ast_hash": "d14c7561ae7abd7eb9eba672d2c3a086",
+    "semantic_hash": ""
+  },
+  "Source/Patches/StartupInitializer.cs": {
+    "mtime": 1794076943.0695343,
+    "seen": 1794134481.4489775,
+    "ast_hash": "5b6bf51b538aa32076a0f64383a69d04",
+    "semantic_hash": ""
+  },
+  "Source/Patches/TMProLocalize.cs": {
+    "mtime": 1794077019.6255155,
+    "seen": 1794134481.4489775,
+    "ast_hash": "48bf5f1baf4672b4178b5f495ae95d03",
+    "semantic_hash": ""
+  },
+  "Source/Patches/TitleSceneManager.cs": {
+    "mtime": 1794067933.3290493,
+    "seen": 1794134481.4489775,
+    "ast_hash": "a5221a24da51362a70606132d2b29638",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1794133688.361338,
+    "seen": 1794134481.4489775,
+    "ast_hash": "904c89b5284923496213ec485f8d106e",
+    "semantic_hash": ""
+  },
+  "CHECKPOINT.md": {
+    "mtime": 1794134145.6391232,
+    "seen": 1794134481.4489775,
+    "ast_hash": "fa8db32ce0d6b041e81b553281acc179",
+    "semantic_hash": ""
+  },
+  "CHECKPOINT_TESTING.md": {
+    "mtime": 1793965841.5414608,
+    "seen": 1794134481.4489775,
+    "ast_hash": "2373724b21d62987559d48e485d988e4",
+    "semantic_hash": ""
+  },
+  "PLAN.md": {
+    "mtime": 1794130984.6871521,
+    "seen": 1794134481.4489775,
+    "ast_hash": "ee99e7c2c283ef8b5445b64680c285ef",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1793962507.7632208,
+    "seen": 1794134481.4489775,
+    "ast_hash": "8d68f7593db2e7e5e694b81ab063350f",
+    "semantic_hash": ""
+  },
+  "Data/icon.png": {
+    "mtime": 1793886229.523775,
+    "seen": 1794134481.4489775,
+    "ast_hash": "90d72bcb20bd35d44350b0a0ce346ca7",
+    "semantic_hash": ""
+  }
+}

@@ -1,0 +1,25 @@
+Viết module Python `config.py` cho gói `cli_anything.imouto.core.config`.
+Yêu cầu:
+1. Định nghĩa dataclass hoặc class `ImoutoConfig`:
+   - `project_root`: Path, mặc định "D:\VibeCode\Game_VietHoa\Imouto_Mobile_Project" (hoặc tự động tìm ngược lên nếu tìm thấy "ExportedProject").
+   - `unity_project`: Path, trỏ vào `project_root / "ExportedProject"`.
+   - `unity_exe`: Path, mặc định "D:\Unity\Editor\2022.3.62f1\Editor\Unity.exe" (kiểm tra thêm env UNITY_EXE hoặc `shutil.which("unity")`).
+   - `java_home`: Path, mặc định "D:\Unity\Editor\2022.3.62f1\Editor\Data\PlaybackEngines\AndroidPlayer\OpenJDK".
+   - `apksigner`: Path, mặc định "D:\Unity\Editor\2022.3.62f1\Editor\Data\PlaybackEngines\AndroidPlayer\SDK\build-tools\34.0.0\apksigner.bat".
+   - `keystore`: Path, mặc định "C:\Users\LvH\.android\debug.keystore".
+   - `keystore_pass`: str = "android"
+   - `build_output`: Path = `project_root / "BuildOutput"`
+   - `unsigned_apk`: Path = `build_output / "Imouto_Native_Unsigned.apk"`
+   - `signed_apk`: Path = `build_output / "Imouto_Native_Signed.apk"`
+   - `delivered_apk`: Path = "D:\Downloads\Imouto_Native_Android.apk"
+   - `ldplayer_dir`: Path, mặc định "D:\LDPlayer\LDPlayer9"
+   - `ldconsole`: Path = `ldplayer_dir / "ldconsole.exe"`
+   - `adb_exe`: Path = `ldplayer_dir / "adb.exe"` (hoặc shutil.which("adb"))
+   - `package_name`: str = "com.imouto.viethoa"
+   - `main_activity`: str = "com.unity3d.player.UnityPlayerActivity"
+2. Các hàm/phương thức:
+   - `validate() -> dict[str, bool]`: Kiểm tra sự tồn tại của từng đường dẫn chính và trả về dictionary trạng thái boolean.
+   - `to_dict() -> dict`: Chuyển config thành dict (chuỗi string cho Path) để serialize JSON.
+   - `from_dict(d: dict) -> ImoutoConfig`: Khởi tạo từ dict.
+   - `get_default_config() -> ImoutoConfig`
+3. Viết code sạch, tương thích Python 3.10+, typing đầy đủ, docstring rõ ràng, chỉ trả về code Python hoàn chỉnh, không bao quanh bằng markdown hoặc giải thích bên ngoài.
