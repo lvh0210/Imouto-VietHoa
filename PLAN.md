@@ -23,8 +23,8 @@
   - [x] 4.3: Đăng ký toàn bộ Shaders vào `GraphicsSettings.asset` (`m_AlwaysIncludedShaders`)
   - [x] 4.4: Biên dịch lại Unity Android IL2CPP qua `cli-anything-imouto build` (0 shader error, 8 programs GLES3)
   - [x] 4.5: Ký số APK chuẩn Android V2+V3 qua `cli-anything-imouto sign` và xuất ra `D:\Downloads\Imouto_Native_Android.apk`
-- [-] **Chặng 5: Đồng bộ Git & Phát hành GitHub Release v2.0.4**
-  - [-] 5.1: Đồng bộ mã nguồn và bản vá vào Git repository
-  - [ ] 5.2: Đẩy commit lên nhánh `origin/main`
-  - [ ] 5.3: Tạo GitHub Release `v2.0.4` đính kèm APK đã ký số và phát hành cho người dùng
-  - [ ] 5.4: Cập nhật CHECKPOINT.md và báo cáo hoàn tất
+- [x] **Chặng 5: Đồng bộ Git & Phát hành GitHub Release v2.0.4**
+  - [x] 5.1: Đồng bộ mã nguồn và bản vá vào Git repository
+  - [x] 5.2: Đẩy commit lên nhánh `origin/main` (`2e257a5`)
+  - [x] 5.3: Tạo GitHub Release `v2.0.4` đính kèm APK đã ký số và phát hành thành công
+  - [x] 5.4: Cập nhật CHECKPOINT.md và báo cáo hoàn tất
