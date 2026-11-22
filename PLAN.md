@@ -11,22 +11,20 @@
   - [x] 2.4: Xây dựng CLI entry point với Click (hỗ trợ one-shot subcommands, `--json` và interactive REPL)
   - [x] 2.5: Viết `setup.py` và cài đặt package môi trường cục bộ (`pip install -e agent-harness`)
   - [x] 2.6: Viết bộ test `tests/test_core.py`, lập `TEST.md` và chạy Pytest xác nhận 100% pass (11/11 tests)
-- [x] **Chặng 3: Xử lý triệt để các tồn đọng của Game (Live2D, Shader, Font, Hook)**
-  - [x] 3.1: Tích hợp và đồng bộ thư viện Native `libLive2DCubismCore.so` (arm64-v8a) vào cả 2 vị trí Plugins và kiểm tra meta
-  - [x] 3.2: Kiểm tra và chuẩn hóa Shaders URP tương thích hoàn toàn OpenGL ES 3.0 / Vulkan
-  - [x] 3.3: Tối ưu Font TextMeshPro tiếng Việt và viền hiển thị Title / UI
-  - [x] 3.4: Rà soát Naninovel script & localization hooks, loại bỏ mọi nguy cơ gây kẹt màn hình
-- [x] **Chặng 4: Biên dịch & Ký số tự động bằng CLI-Anything Harness**
-  - [x] 4.1: Chạy biên dịch Unity Android IL2CPP qua lệnh `cli-anything-imouto build` (Thành công 100%, exit code 0)
-  - [x] 4.2: Phân tích log biên dịch, đảm bảo 0 warning chí mạng và 0 error
-  - [x] 4.3: Tự động căn chỉnh zipalign và ký số APK chuẩn V2+V3 qua lệnh `cli-anything-imouto sign` (Đã kiểm tra verify_apk = True)
-- [-] **Chặng 5: Kiểm thử tự động trên OnePlus 7 Pro (End-to-End Verification)**
-  - [x] 5.1: Cài đặt và chạy game thành công trên OnePlus 7 Pro qua ADB
-  - [x] 5.2: Phân tích logcat & screenshot tìm ra nguyên nhân: URP Camera Stack, DOTween inactive freeze, BackGroundCanvas sorting, Live2D P/Invoke, Live2D dummy shader non-URP (magenta artifact), và Mobile Touch PointerUp
-  - [x] 5.3: Vá lỗi toàn diện: Live2D P/Invoke csmGetRenderOrders, SetupURPCameraStack, FadeIn DOTween sequence, ProgressBarSingleton safe checks, Live2D Cubism URP shaders (Unlit & Mask), và UIButtonMaster touch handling
-  - [-] 5.4: Biên dịch lại APK gia tăng và ký số qua `cli-anything-imouto`
-  - [ ] 5.5: Nạp APK vào OnePlus 7 Pro và test thực tế cảnh "Chơi từ đầu" (Live2D & Hội thoại Prologue)
-- [-] **Chặng 6: Hoàn thiện Tài liệu, Sinh SKILL.md & Bàn giao**
-  - [x] 6.1: Sinh `SKILL.md` tự động cho `cli-anything-imouto` (Đã lưu tại canonical và package)
-  - [x] 6.2: Cập nhật `CHECKPOINT.md` và `README.md`
-  - [x] 6.3: Xuất báo cáo tổng kết chi tiết cho người dùng
+- [x] **Chặng 3: Xử lý triệt để các lỗi khởi tạo, DOTween, URP Camera & Live2D P/Invoke**
+  - [x] 3.1: Tích hợp và đồng bộ thư viện Native `libLive2DCubismCore.so` (arm64-v8a)
+  - [x] 3.2: Patch P/Invoke `csmGetRenderOrders` trong `Live2D.Cubism.dll`
+  - [x] 3.3: Cấu hình Base/Overlay camera stack trong URP (`SceneMaster.SetupURPCameraStack`)
+  - [x] 3.4: Khắc phục treo DOTween FadeIn trên object inactive
+  - [x] 3.5: Cải thiện touch handling trong `UIButtonMaster.cs` cho màn hình cảm ứng di động
+- [x] **Chặng 4: Khắc phục triệt để lỗi Shader Mảng Hồng Tím (Live2D & Naninovel URP)**
+  - [x] 4.1: Tái cấu trúc Live2D Cubism shaders (`Unlit` & `Mask`) sang self-contained UnityCG (loại bỏ lỗi thiếu `Core.hlsl` package)
+  - [x] 4.2: Tái cấu trúc Naninovel shaders (`RevealableTMProText`, `TransitionalTexture`, `TransitionalUI`, `Transparent`, `DepthMask`)
+  - [x] 4.3: Đăng ký toàn bộ Shaders vào `GraphicsSettings.asset` (`m_AlwaysIncludedShaders`)
+  - [x] 4.4: Biên dịch lại Unity Android IL2CPP qua `cli-anything-imouto build` (0 shader error, 8 programs GLES3)
+  - [x] 4.5: Ký số APK chuẩn Android V2+V3 qua `cli-anything-imouto sign` và xuất ra `D:\Downloads\Imouto_Native_Android.apk`
+- [-] **Chặng 5: Đồng bộ Git & Phát hành GitHub Release v2.0.4**
+  - [-] 5.1: Đồng bộ mã nguồn và bản vá vào Git repository
+  - [ ] 5.2: Đẩy commit lên nhánh `origin/main`
+  - [ ] 5.3: Tạo GitHub Release `v2.0.4` đính kèm APK đã ký số và phát hành cho người dùng
+  - [ ] 5.4: Cập nhật CHECKPOINT.md và báo cáo hoàn tất

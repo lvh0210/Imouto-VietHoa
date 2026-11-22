@@ -1,64 +1,86 @@
 Shader "Naninovel/FX/Digital Glitch" {
-	Properties {
-		_MainTex ("Base (RGB)", 2D) = "white" {}
-		_GlitchTex ("Glitch Texture", 2D) = "white" {}
-		_Intensity ("Glitch Intensity", Range(0.5, 2)) = 1
-		_ColorTint ("Color Tint", Vector) = (0.2,0.2,0,0)
-		_BurnColors ("Burn Colors", Range(0, 1)) = 1
-		_DodgeColors ("Dodge Colors", Range(0, 1)) = 0
-		_PerformUVShifting ("Perform UV Shifting", Range(0, 1)) = 1
-		_PerformColorShifting ("Perform Color Shifting", Range(0, 1)) = 1
-		_PerformScreenShifting ("Perform Screen Shifting", Range(0, 1)) = 1
-	}
-	//DummyShaderTextExporter
-	SubShader{
-		Tags { "RenderType"="Opaque" }
-		LOD 200
+    Properties {
+        _MainTex ("Base (RGB)", 2D) = "white" {}
+        _GlitchTex ("Glitch Texture", 2D) = "white" {}
+        _Intensity ("Glitch Intensity", Range(0.5, 2)) = 1
+        _ColorTint ("Color Tint", Color) = (0.2,0.2,0,0)
+        _BurnColors ("Burn Colors", Range(0, 1)) = 1
+        _DodgeColors ("Dodge Colors", Range(0, 1)) = 0
+        _PerformUVShifting ("Perform UV Shifting", Range(0, 1)) = 1
+        _PerformColorShifting ("Perform Color Shifting", Range(0, 1)) = 1
+        _PerformScreenShifting ("Perform Screen Shifting", Range(0, 1)) = 1
+    }
+    SubShader {
+        Tags { "Queue"="Transparent" "IgnoreProjector"="True" "RenderType"="Transparent" }
+        Cull Off
+        ZWrite Off
+        Blend SrcAlpha OneMinusSrcAlpha
 
-		Pass
-		{
-			HLSLPROGRAM
-			#pragma vertex vert
-			#pragma fragment frag
+        Pass {
+            Tags { "LightMode"="UniversalForward" }
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma target 2.0
+            #include "UnityCG.cginc"
 
-			float4x4 unity_ObjectToWorld;
-			float4x4 unity_MatrixVP;
-			float4 _MainTex_ST;
+            struct appdata {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-			struct Vertex_Stage_Input
-			{
-				float4 pos : POSITION;
-				float2 uv : TEXCOORD0;
-			};
+            struct v2f {
+                float4 vertex : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-			struct Vertex_Stage_Output
-			{
-				float2 uv : TEXCOORD0;
-				float4 pos : SV_POSITION;
-			};
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
 
-			Vertex_Stage_Output vert(Vertex_Stage_Input input)
-			{
-				Vertex_Stage_Output output;
-				output.uv = (input.uv.xy * _MainTex_ST.xy) + _MainTex_ST.zw;
-				output.pos = mul(unity_MatrixVP, mul(unity_ObjectToWorld, input.pos));
-				return output;
-			}
+            v2f vert(appdata v) {
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                return o;
+            }
 
-			Texture2D<float4> _MainTex;
-			SamplerState sampler_MainTex;
+            fixed4 frag(v2f i) : SV_Target {
+                return tex2D(_MainTex, i.uv);
+            }
+            ENDCG
+        }
+        Pass {
+            Tags { "LightMode"="SRPDefaultUnlit" }
+            CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+            #pragma target 2.0
+            #include "UnityCG.cginc"
 
-			struct Fragment_Stage_Input
-			{
-				float2 uv : TEXCOORD0;
-			};
+            struct appdata {
+                float4 vertex : POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-			float4 frag(Fragment_Stage_Input input) : SV_TARGET
-			{
-				return _MainTex.Sample(sampler_MainTex, input.uv.xy);
-			}
+            struct v2f {
+                float4 vertex : SV_POSITION;
+                float2 uv : TEXCOORD0;
+            };
 
-			ENDHLSL
-		}
-	}
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+
+            v2f vert(appdata v) {
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                return o;
+            }
+
+            fixed4 frag(v2f i) : SV_Target {
+                return tex2D(_MainTex, i.uv);
+            }
+            ENDCG
+        }
+    }
 }

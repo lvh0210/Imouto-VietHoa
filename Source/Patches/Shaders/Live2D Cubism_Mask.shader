@@ -12,7 +12,6 @@ Shader "Live2D Cubism/Mask"
             "Queue" = "Transparent"
             "IgnoreProjector" = "True"
             "RenderType" = "Transparent"
-            "RenderPipeline" = "UniversalPipeline"
         }
         LOD 100
         Cull [_Cull]
@@ -24,34 +23,35 @@ Shader "Live2D Cubism/Mask"
             Name "UniversalForward"
             Tags { "LightMode" = "UniversalForward" }
 
-            HLSLPROGRAM
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 2.0
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "UnityCG.cginc"
 
-            struct Attributes
+            struct appdata
             {
-                float4 positionOS   : POSITION;
+                float4 vertex : POSITION;
             };
 
-            struct Varyings
+            struct v2f
             {
-                float4 positionCS   : SV_POSITION;
+                float4 vertex : SV_POSITION;
             };
 
-            Varyings vert(Attributes input)
+            v2f vert(appdata v)
             {
-                Varyings output;
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                return output;
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                return o;
             }
 
-            half4 frag(Varyings input) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                return half4(1.0, 1.0, 1.0, 1.0);
+                return fixed4(1.0, 1.0, 1.0, 1.0);
             }
-            ENDHLSL
+            ENDCG
         }
 
         Pass
@@ -59,34 +59,35 @@ Shader "Live2D Cubism/Mask"
             Name "SRPDefaultUnlit"
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
-            HLSLPROGRAM
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 2.0
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "UnityCG.cginc"
 
-            struct Attributes
+            struct appdata
             {
-                float4 positionOS   : POSITION;
+                float4 vertex : POSITION;
             };
 
-            struct Varyings
+            struct v2f
             {
-                float4 positionCS   : SV_POSITION;
+                float4 vertex : SV_POSITION;
             };
 
-            Varyings vert(Attributes input)
+            v2f vert(appdata v)
             {
-                Varyings output;
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                return output;
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                return o;
             }
 
-            half4 frag(Varyings input) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                return half4(1.0, 1.0, 1.0, 1.0);
+                return fixed4(1.0, 1.0, 1.0, 1.0);
             }
-            ENDHLSL
+            ENDCG
         }
     }
 }

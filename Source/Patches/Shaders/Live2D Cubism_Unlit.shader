@@ -1,11 +1,11 @@
-﻿Shader "Live2D Cubism/Unlit"
+Shader "Live2D Cubism/Unlit"
 {
     Properties
     {
         [PerRendererData] _MainTex ("Main Texture", 2D) = "white" {}
         [PerRendererData] cubism_ModelOpacity ("Model Opacity", Float) = 1
-        [PerRendererData] cubism_MultiplyColor ("Multiply Color", Vector) = (1, 1, 1, 1)
-        [PerRendererData] cubism_ScreenColor ("Screen Color", Vector) = (0, 0, 0, 0)
+        [PerRendererData] cubism_MultiplyColor ("Multiply Color", Color) = (1, 1, 1, 1)
+        [PerRendererData] cubism_ScreenColor ("Screen Color", Color) = (0, 0, 0, 0)
         _SrcColor ("Source Color", Float) = 1
         _DstColor ("Destination Color", Float) = 10
         _SrcAlpha ("Source Alpha", Float) = 1
@@ -26,7 +26,6 @@
             "IgnoreProjector" = "True"
             "RenderType" = "Transparent"
             "PreviewType" = "Plane"
-            "RenderPipeline" = "UniversalPipeline"
         }
         LOD 100
         Cull [_Cull]
@@ -38,90 +37,80 @@
             Name "UniversalForward"
             Tags { "LightMode" = "UniversalForward" }
 
-            HLSLPROGRAM
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 2.0
             #pragma multi_compile _ CUBISM_MASK_ON
             #pragma multi_compile _ CUBISM_INVERT_ON
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "UnityCG.cginc"
 
-            struct Attributes
+            struct appdata
             {
-                float4 positionOS   : POSITION;
-                float4 color        : COLOR;
-                float2 uv           : TEXCOORD0;
+                float4 vertex   : POSITION;
+                fixed4 color    : COLOR;
+                float2 uv       : TEXCOORD0;
             };
 
-            struct Varyings
+            struct v2f
             {
-                float4 positionCS   : SV_POSITION;
-                float4 color        : COLOR;
-                float2 uv           : TEXCOORD0;
+                float4 vertex   : SV_POSITION;
+                fixed4 color    : COLOR;
+                float2 uv       : TEXCOORD0;
                 #if defined(CUBISM_MASK_ON)
-                float4 screenPos    : TEXCOORD1;
+                float4 clipPos  : TEXCOORD1;
                 #endif
             };
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+            fixed cubism_ModelOpacity;
+            fixed4 cubism_MultiplyColor;
+            fixed4 cubism_ScreenColor;
 
             #if defined(CUBISM_MASK_ON)
-            TEXTURE2D(cubism_MaskTexture);
-            SAMPLER(sampler_cubism_MaskTexture);
+            sampler2D cubism_MaskTexture;
+            float4 cubism_MaskTile;
+            float4 cubism_MaskTransform;
             #endif
 
-            CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float cubism_ModelOpacity;
-                float4 cubism_MultiplyColor;
-                float4 cubism_ScreenColor;
-                #if defined(CUBISM_MASK_ON)
-                float4 cubism_MaskTile;
-                float4 cubism_MaskTransform;
-                #endif
-            CBUFFER_END
-
-            Varyings vert(Attributes input)
+            v2f vert(appdata v)
             {
-                Varyings output;
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                output.uv = TRANSFORM_TEX(input.uv, _MainTex);
-                output.color = input.color;
-
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.color = v.color;
                 #if defined(CUBISM_MASK_ON)
-                output.screenPos = ComputeScreenPos(output.positionCS);
+                o.clipPos = ComputeScreenPos(o.vertex);
                 #endif
-
-                return output;
+                return o;
             }
 
-            half4 frag(Varyings input) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
+                fixed4 col = tex2D(_MainTex, i.uv);
 
-                // Live2D Multiply Color
                 col.rgb *= cubism_MultiplyColor.rgb;
-                // Live2D Screen Color
                 col.rgb = col.rgb + cubism_ScreenColor.rgb * (1.0 - col.rgb);
 
-                col *= input.color;
+                col *= i.color;
                 col.a *= cubism_ModelOpacity;
 
                 #if defined(CUBISM_MASK_ON)
-                float2 maskUV = (input.screenPos.xy / input.screenPos.w) * cubism_MaskTransform.xy + cubism_MaskTransform.zw;
-                half4 maskColor = SAMPLE_TEXTURE2D(cubism_MaskTexture, sampler_cubism_MaskTexture, maskUV);
+                float2 maskUV = (i.clipPos.xy / i.clipPos.w) * cubism_MaskTransform.xy + cubism_MaskTransform.zw;
+                fixed4 maskCol = tex2D(cubism_MaskTexture, maskUV);
                 #if defined(CUBISM_INVERT_ON)
-                half maskVal = 1.0 - maskColor.a;
+                fixed maskVal = 1.0 - maskCol.a;
                 #else
-                half maskVal = maskColor.a;
+                fixed maskVal = maskCol.a;
                 #endif
                 col.a *= maskVal;
                 #endif
 
                 return col;
             }
-            ENDHLSL
+            ENDCG
         }
 
         Pass
@@ -129,88 +118,80 @@
             Name "SRPDefaultUnlit"
             Tags { "LightMode" = "SRPDefaultUnlit" }
 
-            HLSLPROGRAM
+            CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
+            #pragma target 2.0
             #pragma multi_compile _ CUBISM_MASK_ON
             #pragma multi_compile _ CUBISM_INVERT_ON
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "UnityCG.cginc"
 
-            struct Attributes
+            struct appdata
             {
-                float4 positionOS   : POSITION;
-                float4 color        : COLOR;
-                float2 uv           : TEXCOORD0;
+                float4 vertex   : POSITION;
+                fixed4 color    : COLOR;
+                float2 uv       : TEXCOORD0;
             };
 
-            struct Varyings
+            struct v2f
             {
-                float4 positionCS   : SV_POSITION;
-                float4 color        : COLOR;
-                float2 uv           : TEXCOORD0;
+                float4 vertex   : SV_POSITION;
+                fixed4 color    : COLOR;
+                float2 uv       : TEXCOORD0;
                 #if defined(CUBISM_MASK_ON)
-                float4 screenPos    : TEXCOORD1;
+                float4 clipPos  : TEXCOORD1;
                 #endif
             };
 
-            TEXTURE2D(_MainTex);
-            SAMPLER(sampler_MainTex);
+            sampler2D _MainTex;
+            float4 _MainTex_ST;
+            fixed cubism_ModelOpacity;
+            fixed4 cubism_MultiplyColor;
+            fixed4 cubism_ScreenColor;
 
             #if defined(CUBISM_MASK_ON)
-            TEXTURE2D(cubism_MaskTexture);
-            SAMPLER(sampler_cubism_MaskTexture);
+            sampler2D cubism_MaskTexture;
+            float4 cubism_MaskTile;
+            float4 cubism_MaskTransform;
             #endif
 
-            CBUFFER_START(UnityPerMaterial)
-                float4 _MainTex_ST;
-                float cubism_ModelOpacity;
-                float4 cubism_MultiplyColor;
-                float4 cubism_ScreenColor;
-                #if defined(CUBISM_MASK_ON)
-                float4 cubism_MaskTile;
-                float4 cubism_MaskTransform;
-                #endif
-            CBUFFER_END
-
-            Varyings vert(Attributes input)
+            v2f vert(appdata v)
             {
-                Varyings output;
-                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
-                output.uv = TRANSFORM_TEX(input.uv, _MainTex);
-                output.color = input.color;
-
+                v2f o;
+                o.vertex = UnityObjectToClipPos(v.vertex);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.color = v.color;
                 #if defined(CUBISM_MASK_ON)
-                output.screenPos = ComputeScreenPos(output.positionCS);
+                o.clipPos = ComputeScreenPos(o.vertex);
                 #endif
-
-                return output;
+                return o;
             }
 
-            half4 frag(Varyings input) : SV_Target
+            fixed4 frag(v2f i) : SV_Target
             {
-                half4 col = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
+                fixed4 col = tex2D(_MainTex, i.uv);
 
                 col.rgb *= cubism_MultiplyColor.rgb;
                 col.rgb = col.rgb + cubism_ScreenColor.rgb * (1.0 - col.rgb);
 
-                col *= input.color;
+                col *= i.color;
                 col.a *= cubism_ModelOpacity;
 
                 #if defined(CUBISM_MASK_ON)
-                float2 maskUV = (input.screenPos.xy / input.screenPos.w) * cubism_MaskTransform.xy + cubism_MaskTransform.zw;
-                half4 maskColor = SAMPLE_TEXTURE2D(cubism_MaskTexture, sampler_cubism_MaskTexture, maskUV);
+                float2 maskUV = (i.clipPos.xy / i.clipPos.w) * cubism_MaskTransform.xy + cubism_MaskTransform.zw;
+                fixed4 maskCol = tex2D(cubism_MaskTexture, maskUV);
                 #if defined(CUBISM_INVERT_ON)
-                half maskVal = 1.0 - maskColor.a;
+                fixed maskVal = 1.0 - maskCol.a;
                 #else
-                half maskVal = maskColor.a;
+                fixed maskVal = maskCol.a;
                 #endif
                 col.a *= maskVal;
                 #endif
 
                 return col;
             }
-            ENDHLSL
+            ENDCG
         }
     }
 }

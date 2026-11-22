@@ -1,39 +1,47 @@
-# CHECKPOINT: Khắc phục triệt để lỗi chuyển cảnh, Live2D Render URP & Touch Controls
+# CHECKPOINT: Khắc phục triệt để lỗi Mảng Hồng Tím (Live2D & Naninovel Shaders URP)
 
 ## 1. Thông tin phiên làm việc
-- **Thời gian cập nhật:** 2026-11-22
-- **Thiết bị kiểm thử:** OnePlus 7 Pro (Android 12, Rooted, Serial: `c1b6357c`)
-- **Gói cài đặt:** `D:\Downloads\Imouto_Native_Android.apk` (Ký số chuẩn V2+V3)
+- **Thời gian cập nhật:** 2026-11-22 23:30
+- **Phiên bản phát hành:** `v2.0.4`
+- **Gói cài đặt:** `D:\Downloads\Imouto_Native_Android.apk` (525.9 MB, Ký số chuẩn V2+V3)
 - **Hệ thống điều khiển:** `cli-anything-imouto` (Harness theo chuẩn HKUDS)
+- **Thiết bị người dùng test:** OnePlus 7 Pro (Android 12, Rooted)
 
 ---
 
-## 2. Các vấn đề cốt lõi đã được phát hiện & triệt tiêu
+## 2. Nguyên nhân gốc rễ và Biện pháp xử lý triệt để "Mảng Hồng Tím"
 
-### Vấn đề 1: Đen màn khi bấm "Chơi từ đầu" (Black Screen)
-- **Nguyên nhân 1 (URP Camera Stacking):** Naninovel cameras (`Camera` và `UICamera`) không nằm trong `cameraStack` của Base Camera trong Universal Render Pipeline, làm ghi đè framebuffer đen.
-  - *Đã xử lý:* Triển khai `SceneMaster.SetupURPCameraStack()` tự động cấu hình Base/Overlay camera stack trong URP.
-- **Nguyên nhân 2 (DOTween Inactive Object Freeze):** `FadeIn` gọi `ForceDismissBlackScreen()` khi bắt đầu sequence khiến GameObject `black` bị `SetActive(false)`. DOTween không thể chạy tween trên object bị disable khiến `AsyncWaitForCompletion()` treo vô hạn ở dòng 4 của Prologue.
-  - *Đã xử lý:* Tách biệt logic fade, chỉ ẩn và hủy raycast khi sequence hoàn tất.
-- **Nguyên nhân 3 (Live2D P/Invoke Core Mismatch):** Live2D Cubism 5.x đổi tên `csmGetDrawableRenderOrders` thành `csmGetRenderOrders`.
-  - *Đã xử lý:* Dùng Mono.Cecil patch trực tiếp `Live2D.Cubism.dll`.
+### Vấn đề cốt lõi
+- Khi bấm "Chơi từ đầu" (New Game), game chuyển cảnh qua Prologue vào Main scene (phòng khách/phòng ngủ).
+- Tại đây, mô hình Live2D em gái (`妹`) và giao diện đối thoại / chuyển cảnh Naninovel bị hiển thị thành một **khối đa giác màu hồng tím (#FF00FF)** đặc quánh che toàn bộ màn hình.
 
-### Vấn đề 2: Lỗi Shader Live2D hiển thị khối tím/hồng (Magenta Polygon Artifact)
-- **Nguyên nhân:** Toàn bộ shader `Live2D Cubism/Unlit` và `Live2D Cubism/Mask` trong dự án ban đầu chỉ là file giả lập (`//DummyShaderTextExporter`), không tương thích Universal Render Pipeline (URP). Trên OpenGL ES 3 / Vulkan của Android, các shader này thiếu `Core.hlsl` và `TransformObjectToHClip`, dẫn đến lỗi shader compilation và Unity vẽ màu tím (#FF00FF).
-- **Đã xử lý:** 
-  - Tái cấu trúc hoàn toàn `Live2D Cubism/Unlit` và `Live2D Cubism/Mask` chuẩn URP HLSL:
-    - Nhúng `Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl`
-    - Áp dụng `TransformObjectToHClip` và `CBUFFER_START(UnityPerMaterial)`
-    - Hỗ trợ đầy đủ `CUBISM_MASK_ON` và `CUBISM_INVERT_ON` cho mặt nạ cắt mắt/mi
-    - Đồng bộ mã shader vào cả 3 vị trí: `Resources/live2d/cubism/shaders/unlit.shader`, `Assets/Shader/Live2D Cubism_Unlit.shader`, và `Assets/Shader/Live2D Cubism_Unlit_0.shader`.
-  - Đăng ký 4 shader Live2D vào `Always Included Shaders` trong `ProjectSettings/GraphicsSettings.asset` để ngăn Unity tước bỏ (strip) khi build APK.
+### Phân tích nguyên nhân kỹ thuật
+1. **Lỗi thiếu gói thư viện `Core.hlsl` của Live2D Shaders:**
+   - Phiên bản trước sử dụng `#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"`.
+   - Dự án ExportedProject sử dụng các DLL runtime URP trong `Assets/Plugins/` thay vì gói UPM trong `Packages/`. Do đó, đường dẫn gói không tồn tại trên đĩa khiến shader `Live2D Cubism/Unlit` và `Live2D Cubism/Mask` phát sinh lỗi biên dịch nghiêm trọng (`Shader error: Couldn't open include file`).
+   - Unity không thể biên dịch binary GLES3/Vulkan (0 internal programs) và buộc phải thay thế bằng `materialErrorPS` (Shader lỗi màu hồng tím đặc).
+2. **Naninovel Core Shaders là file rỗng (`//DummyShaderTextExporter`):**
+   - Toàn bộ các shader Naninovel trong `Assets/Resources/naninovel/shaders/` (`RevealableTMProText`, `TransitionalTexture`, `TransitionalUI`, `Transparent`, `DepthMask`, `DigitalGlitch`, v.v.) vốn là stub rỗng trích xuất từ AssetRipper không có pass URP và blending, gây lỗi render khi gọi hội thoại hoặc chuyển ảnh nền.
 
-### Vấn đề 3: Phím cảm ứng trên Mobile / ADB (Touch Responsiveness)
-- **Nguyên nhân:** `UIButtonMaster.cs` chỉ gán `isPointerInside = true` khi nhận sự kiện `OnPointerEnter` (vốn là sự kiện rê chuột của PC). Trên màn hình cảm ứng điện thoại, ngón tay chạm trực tiếp (`PointerDown`), khiến `isPointerInside` giữ giá trị false và sự kiện `OnPointerUp` hủy bỏ `MouseClick()`.
-- **Đã xử lý:** Cập nhật `OnPointerDown` tự động kích hoạt `isPointerInside = true` và cho phép `OnPointerUp` thực thi `MouseClick()` ngay khi có `actionFlag`.
+### Giải pháp kỹ thuật đã triển khai (Phiên bản v2.0.4)
+1. **Tái cấu trúc Live2D Shaders (`Live2D Cubism/Unlit` & `Live2D Cubism/Mask`):**
+   - Chuyển toàn bộ sang chuẩn self-contained Cg/UnityCG (`UnityObjectToClipPos`, `ComputeScreenPos`) đi kèm với Unity Editor (không phụ thuộc vào bất kỳ package ngoài nào).
+   - Tích hợp 2 pass render tương thích tối đa URP: `UniversalForward` và `SRPDefaultUnlit`.
+   - Hỗ trợ đầy đủ các thuộc tính hòa trộn Live2D: `cubism_MultiplyColor`, `cubism_ScreenColor`, `cubism_ModelOpacity`, cùng tính năng mặt nạ mắt `CUBISM_MASK_ON` và đảo mặt nạ `CUBISM_INVERT_ON`.
+   - Kết quả biên dịch: `Live2D Cubism/Unlit` sinh thành công 8 programs GLES3 (4 unique), `Live2D Cubism/Mask` sinh 2 programs GLES3 với **0 lỗi biên dịch**.
+2. **Tái cấu trúc 12 Naninovel Shaders:**
+   - Xây dựng hoàn chỉnh shader TextMeshPro Distance Field với hiệu ứng gõ chữ `_LineClipRect` và `_CharClipRect` cho `Naninovel/RevealableTMProText` (và các biến thể Extra, RTL).
+   - Xây dựng shader chuyển cảnh nền `Naninovel/TransitionalTexture` và `Naninovel/TransitionalUI` hỗ trợ Stencil và UI Clipping.
+   - Xây dựng shader `Hidden/Naninovel/Transparent` và `Hidden/Naninovel/DepthMask`.
+3. **Đăng ký Always Included Shaders:**
+   - Đăng ký toàn bộ 12 GUIDs shader Naninovel và 4 GUIDs Live2D vào `GraphicsSettings.asset` (`m_AlwaysIncludedShaders`) đảm bảo IL2CPP compiler giữ lại đầy đủ binary trên Android.
+4. **Biên dịch & Ký số thành công:**
+   - `cli-anything-imouto build` hoàn thành với mã thoát 0 (0 error, 0 warning).
+   - `cli-anything-imouto sign` hoàn thành ký số APK V1 + V2 + V3, xác thực `verified: True`.
+   - Đã xuất bản tệp `D:\Downloads\Imouto_Native_Android.apk` sẵn sàng cho người dùng kiểm thử.
 
 ---
 
 ## 3. Trạng thái hiện tại
-- Đang thực hiện biên dịch gia tăng Unity IL2CPP APK bằng `cli-anything-imouto build`.
-- Tiếp tục tự động ký số và triển khai trực tiếp vào OnePlus 7 Pro.
+- Đã sẵn sàng phát hành GitHub Release `v2.0.4`.
+- Người dùng tự kiểm thử trực tiếp trên thiết bị OnePlus 7 Pro.
